@@ -1,5 +1,14 @@
 ## Legal Referral UI
-[Download the video](assets/preview_video/video.mp4)
+
+https://github.com/user-attachments/assets/1d5b1785-ef85-4cae-bac8-6f2a0b736e76
+
+## Description
+
+- This project is a specialized platform designed for lawyers to create accounts based on their job preferences, ensuring they hold a valid attorney license.
+
+- Once approved, lawyers can refer specific cases to one another, earning compensation for their referrals. Additionally, they can manage their professional feed. 
+
+- Essentially, it's a LinkedIn-like application tailored for legal professionals, fostering networking and collaboration within the legal community.
 
 ## APP SIGNING
 keytool -genkey -v -keystore ~/legal-referral-dev.jks -keyalg RSA -keysize 2048 -validity 10000 -alias androiddevkey
