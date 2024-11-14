@@ -1,19 +1,14 @@
 class APIConstants {
   APIConstants._();
 
-//  static const baseUrl = 'https://legal-referral.onrender.com/api';
+  static const baseUrl =
+      // 'http://legal-referral-api-prod.ap-south-1.elasticbeanstalk.com/api';
+      'https://api.sixteenbrains.studio/api';
 
-  static const baseUrl = 'http://192.168.29.66:8080/api';
+      // 'http://192.168.77.88:8082/api';
 
-  // static const baseUrl =
-  //     'http://ec2-13-126-240-161.ap-south-1.compute.amazonaws.com:8080/api';
+  static const host = 'legal-referral-api-prod.ap-south-1.elasticbeanstalk.com';
 
-  // static const host = 'legal-referral.onrender.com';
-  // static const host = '192.168.29.66:8080';
-  // static const host = 'legal-referral.onrender.com';
-
-  static const host = '192.168.29.66:8080';
-
-  // static const host =
-  //     'ec2-13-126-240-161.ap-south-1.compute.amazonaws.com:8080';
+  static const authBaseUrl =
+      'https://identitytoolkit.googleapis.com/v1/accounts';
 }

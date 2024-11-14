@@ -29,14 +29,26 @@ mixin _$Post {
   DateTime get createdAt => throw _privateConstructorUsedError;
   @JsonKey(name: 'post_id')
   int get postId => throw _privateConstructorUsedError;
+  @JsonKey(name: 'owner_first_name')
+  String? get ownerFirstName => throw _privateConstructorUsedError;
+  @JsonKey(name: 'owner_last_name')
+  String? get ownerLastName => throw _privateConstructorUsedError;
+  @JsonKey(name: 'owner_avatar_url')
+  String? get ownerAvatarUrl => throw _privateConstructorUsedError;
+  @JsonKey(name: 'owner_practice_area')
+  String? get ownerPracticeArea => throw _privateConstructorUsedError;
   String? get content => throw _privateConstructorUsedError;
   @JsonKey(name: 'media')
   List<String?> get filesUrls => throw _privateConstructorUsedError;
   @JsonKey(name: 'poll_id', includeIfNull: false)
   int? get pollId => throw _privateConstructorUsedError;
 
+  /// Serializes this Post to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+
+  /// Create a copy of Post
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $PostCopyWith<Post> get copyWith => throw _privateConstructorUsedError;
 }
 
@@ -52,6 +64,10 @@ abstract class $PostCopyWith<$Res> {
       @DateTimeJsonConverter()
       DateTime createdAt,
       @JsonKey(name: 'post_id') int postId,
+      @JsonKey(name: 'owner_first_name') String? ownerFirstName,
+      @JsonKey(name: 'owner_last_name') String? ownerLastName,
+      @JsonKey(name: 'owner_avatar_url') String? ownerAvatarUrl,
+      @JsonKey(name: 'owner_practice_area') String? ownerPracticeArea,
       String? content,
       @JsonKey(name: 'media') List<String?> filesUrls,
       @JsonKey(name: 'poll_id', includeIfNull: false) int? pollId});
@@ -67,6 +83,8 @@ class _$PostCopyWithImpl<$Res, $Val extends Post>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of Post
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -74,6 +92,10 @@ class _$PostCopyWithImpl<$Res, $Val extends Post>
     Object? type = null,
     Object? createdAt = null,
     Object? postId = null,
+    Object? ownerFirstName = freezed,
+    Object? ownerLastName = freezed,
+    Object? ownerAvatarUrl = freezed,
+    Object? ownerPracticeArea = freezed,
     Object? content = freezed,
     Object? filesUrls = null,
     Object? pollId = freezed,
@@ -95,6 +117,22 @@ class _$PostCopyWithImpl<$Res, $Val extends Post>
           ? _value.postId
           : postId // ignore: cast_nullable_to_non_nullable
               as int,
+      ownerFirstName: freezed == ownerFirstName
+          ? _value.ownerFirstName
+          : ownerFirstName // ignore: cast_nullable_to_non_nullable
+              as String?,
+      ownerLastName: freezed == ownerLastName
+          ? _value.ownerLastName
+          : ownerLastName // ignore: cast_nullable_to_non_nullable
+              as String?,
+      ownerAvatarUrl: freezed == ownerAvatarUrl
+          ? _value.ownerAvatarUrl
+          : ownerAvatarUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+      ownerPracticeArea: freezed == ownerPracticeArea
+          ? _value.ownerPracticeArea
+          : ownerPracticeArea // ignore: cast_nullable_to_non_nullable
+              as String?,
       content: freezed == content
           ? _value.content
           : content // ignore: cast_nullable_to_non_nullable
@@ -125,6 +163,10 @@ abstract class _$$PostImplCopyWith<$Res> implements $PostCopyWith<$Res> {
       @DateTimeJsonConverter()
       DateTime createdAt,
       @JsonKey(name: 'post_id') int postId,
+      @JsonKey(name: 'owner_first_name') String? ownerFirstName,
+      @JsonKey(name: 'owner_last_name') String? ownerLastName,
+      @JsonKey(name: 'owner_avatar_url') String? ownerAvatarUrl,
+      @JsonKey(name: 'owner_practice_area') String? ownerPracticeArea,
       String? content,
       @JsonKey(name: 'media') List<String?> filesUrls,
       @JsonKey(name: 'poll_id', includeIfNull: false) int? pollId});
@@ -137,6 +179,8 @@ class __$$PostImplCopyWithImpl<$Res>
   __$$PostImplCopyWithImpl(_$PostImpl _value, $Res Function(_$PostImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of Post
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -144,6 +188,10 @@ class __$$PostImplCopyWithImpl<$Res>
     Object? type = null,
     Object? createdAt = null,
     Object? postId = null,
+    Object? ownerFirstName = freezed,
+    Object? ownerLastName = freezed,
+    Object? ownerAvatarUrl = freezed,
+    Object? ownerPracticeArea = freezed,
     Object? content = freezed,
     Object? filesUrls = null,
     Object? pollId = freezed,
@@ -165,6 +213,22 @@ class __$$PostImplCopyWithImpl<$Res>
           ? _value.postId
           : postId // ignore: cast_nullable_to_non_nullable
               as int,
+      ownerFirstName: freezed == ownerFirstName
+          ? _value.ownerFirstName
+          : ownerFirstName // ignore: cast_nullable_to_non_nullable
+              as String?,
+      ownerLastName: freezed == ownerLastName
+          ? _value.ownerLastName
+          : ownerLastName // ignore: cast_nullable_to_non_nullable
+              as String?,
+      ownerAvatarUrl: freezed == ownerAvatarUrl
+          ? _value.ownerAvatarUrl
+          : ownerAvatarUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+      ownerPracticeArea: freezed == ownerPracticeArea
+          ? _value.ownerPracticeArea
+          : ownerPracticeArea // ignore: cast_nullable_to_non_nullable
+              as String?,
       content: freezed == content
           ? _value.content
           : content // ignore: cast_nullable_to_non_nullable
@@ -191,6 +255,10 @@ class _$PostImpl implements _Post {
       @DateTimeJsonConverter()
       required this.createdAt,
       @JsonKey(name: 'post_id') required this.postId,
+      @JsonKey(name: 'owner_first_name') this.ownerFirstName,
+      @JsonKey(name: 'owner_last_name') this.ownerLastName,
+      @JsonKey(name: 'owner_avatar_url') this.ownerAvatarUrl,
+      @JsonKey(name: 'owner_practice_area') this.ownerPracticeArea,
       this.content,
       @JsonKey(name: 'media') final List<String?> filesUrls = const [],
       @JsonKey(name: 'poll_id', includeIfNull: false) this.pollId})
@@ -213,6 +281,18 @@ class _$PostImpl implements _Post {
   @JsonKey(name: 'post_id')
   final int postId;
   @override
+  @JsonKey(name: 'owner_first_name')
+  final String? ownerFirstName;
+  @override
+  @JsonKey(name: 'owner_last_name')
+  final String? ownerLastName;
+  @override
+  @JsonKey(name: 'owner_avatar_url')
+  final String? ownerAvatarUrl;
+  @override
+  @JsonKey(name: 'owner_practice_area')
+  final String? ownerPracticeArea;
+  @override
   final String? content;
   final List<String?> _filesUrls;
   @override
@@ -229,7 +309,7 @@ class _$PostImpl implements _Post {
 
   @override
   String toString() {
-    return 'Post(ownerId: $ownerId, type: $type, createdAt: $createdAt, postId: $postId, content: $content, filesUrls: $filesUrls, pollId: $pollId)';
+    return 'Post(ownerId: $ownerId, type: $type, createdAt: $createdAt, postId: $postId, ownerFirstName: $ownerFirstName, ownerLastName: $ownerLastName, ownerAvatarUrl: $ownerAvatarUrl, ownerPracticeArea: $ownerPracticeArea, content: $content, filesUrls: $filesUrls, pollId: $pollId)';
   }
 
   @override
@@ -242,18 +322,39 @@ class _$PostImpl implements _Post {
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
             (identical(other.postId, postId) || other.postId == postId) &&
+            (identical(other.ownerFirstName, ownerFirstName) ||
+                other.ownerFirstName == ownerFirstName) &&
+            (identical(other.ownerLastName, ownerLastName) ||
+                other.ownerLastName == ownerLastName) &&
+            (identical(other.ownerAvatarUrl, ownerAvatarUrl) ||
+                other.ownerAvatarUrl == ownerAvatarUrl) &&
+            (identical(other.ownerPracticeArea, ownerPracticeArea) ||
+                other.ownerPracticeArea == ownerPracticeArea) &&
             (identical(other.content, content) || other.content == content) &&
             const DeepCollectionEquality()
                 .equals(other._filesUrls, _filesUrls) &&
             (identical(other.pollId, pollId) || other.pollId == pollId));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, ownerId, type, createdAt, postId,
-      content, const DeepCollectionEquality().hash(_filesUrls), pollId);
+  int get hashCode => Object.hash(
+      runtimeType,
+      ownerId,
+      type,
+      createdAt,
+      postId,
+      ownerFirstName,
+      ownerLastName,
+      ownerAvatarUrl,
+      ownerPracticeArea,
+      content,
+      const DeepCollectionEquality().hash(_filesUrls),
+      pollId);
 
-  @JsonKey(ignore: true)
+  /// Create a copy of Post
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$PostImplCopyWith<_$PostImpl> get copyWith =>
@@ -275,6 +376,10 @@ abstract class _Post implements Post {
           @DateTimeJsonConverter()
           required final DateTime createdAt,
           @JsonKey(name: 'post_id') required final int postId,
+          @JsonKey(name: 'owner_first_name') final String? ownerFirstName,
+          @JsonKey(name: 'owner_last_name') final String? ownerLastName,
+          @JsonKey(name: 'owner_avatar_url') final String? ownerAvatarUrl,
+          @JsonKey(name: 'owner_practice_area') final String? ownerPracticeArea,
           final String? content,
           @JsonKey(name: 'media') final List<String?> filesUrls,
           @JsonKey(name: 'poll_id', includeIfNull: false) final int? pollId}) =
@@ -296,6 +401,18 @@ abstract class _Post implements Post {
   @JsonKey(name: 'post_id')
   int get postId;
   @override
+  @JsonKey(name: 'owner_first_name')
+  String? get ownerFirstName;
+  @override
+  @JsonKey(name: 'owner_last_name')
+  String? get ownerLastName;
+  @override
+  @JsonKey(name: 'owner_avatar_url')
+  String? get ownerAvatarUrl;
+  @override
+  @JsonKey(name: 'owner_practice_area')
+  String? get ownerPracticeArea;
+  @override
   String? get content;
   @override
   @JsonKey(name: 'media')
@@ -303,8 +420,11 @@ abstract class _Post implements Post {
   @override
   @JsonKey(name: 'poll_id', includeIfNull: false)
   int? get pollId;
+
+  /// Create a copy of Post
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$PostImplCopyWith<_$PostImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

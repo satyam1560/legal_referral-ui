@@ -5,7 +5,6 @@ import 'package:legal_referral_ui/src/core/config/config.dart';
 import 'package:legal_referral_ui/src/core/network/network.dart';
 import 'package:legal_referral_ui/src/features/auth/data/data.dart';
 import 'package:legal_referral_ui/src/features/auth/domain/domain.dart';
-import 'package:legal_referral_ui/src/features/auth/domain/entities/app_user.dart';
 
 class AuthDataSource {
   AuthDataSource({
@@ -13,6 +12,51 @@ class AuthDataSource {
   }) : _apiClient = apiClient;
 
   final APIClient _apiClient;
+
+  Future<EmailAuthRes?> signInWithEmail({
+    required EmailSignInReq emailSignInReq,
+  }) async {
+    try {
+      final response = await _apiClient.signInWithEmail(
+        emailSignInReq,
+      );
+      return response;
+    } catch (_) {
+      rethrow;
+    }
+  }
+
+  Future<EmailAuthRes?> signUpWithEmail({
+    required EmailSignUpReq emailSignUpReq,
+  }) async {
+    try {
+      final user = await _apiClient.signUpWithEmail(
+        email: emailSignUpReq.email,
+        password: emailSignUpReq.password,
+        firstName: emailSignUpReq.firstName,
+        lastName: emailSignUpReq.lastName,
+        mobile: emailSignUpReq.mobile,
+        avatarUrl: emailSignUpReq.avatarUrl,
+        avatarFile: emailSignUpReq.avararFile,
+      );
+      return user;
+    } catch (_) {
+      rethrow;
+    }
+  }
+
+  Future<RefreshTokenRes?> refreshToken({
+    required RefreshTokenReq refreshTokenReq,
+  }) async {
+    try {
+      final response = await _apiClient.refreshToken(
+        refreshTokenReq,
+      );
+      return response;
+    } catch (_) {
+      rethrow;
+    }
+  }
 
   Future<AppUser?> createUser({
     required String email,
@@ -132,6 +176,16 @@ class AuthDataSource {
     try {
       final user = await _apiClient.getUser(userId);
       return user;
+    } catch (_) {
+      rethrow;
+    }
+  }
+
+  Future<void> saveDeviceDetails({
+    required DeviceDetails deviceDetails,
+  }) async {
+    try {
+      await _apiClient.saveDeviceDetails(deviceDetails);
     } catch (_) {
       rethrow;
     }

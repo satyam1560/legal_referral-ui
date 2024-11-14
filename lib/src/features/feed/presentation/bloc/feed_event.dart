@@ -26,22 +26,36 @@ class FeedRefreshed extends FeedEvent {
   List<Object> get props => [userId];
 }
 
-class PostLiked extends FeedEvent {
-  const PostLiked({
+class FeedPostLiked extends FeedEvent {
+  const FeedPostLiked({
+    required this.userId,
+    required this.senderId,
     required this.postId,
     required this.index,
+    required this.isFromeDetails,
   });
+  final String userId;
+  final String senderId;
   final int postId;
   final int index;
+  final bool isFromeDetails;
+
+  @override
+  List<Object> get props => [userId, senderId, postId, index, isFromeDetails];
 }
 
-class PostUnliked extends FeedEvent {
-  const PostUnliked({
+class FeedPostUnliked extends FeedEvent {
+  const FeedPostUnliked({
     required this.postId,
     required this.index,
+    required this.isFromeDetails,
   });
   final int postId;
   final int index;
+  final bool isFromeDetails;
+
+  @override
+  List<Object> get props => [postId, index, isFromeDetails];
 }
 
 class PostLikedUsersFetched extends FeedEvent {
@@ -110,4 +124,58 @@ class ParentCommentIdChanged extends FeedEvent {
 
   @override
   List<Object> get props => [parentCommentId];
+}
+
+class PostLikesAndCommentsCountFetched extends FeedEvent {
+  const PostLikesAndCommentsCountFetched({
+    required this.postId,
+  });
+  final int postId;
+
+  @override
+  List<Object> get props => [postId];
+}
+
+class PostIsLikedFetched extends FeedEvent {
+  const PostIsLikedFetched({
+    required this.postId,
+  });
+  final int postId;
+
+  @override
+  List<Object> get props => [postId];
+}
+
+class PostSaved extends FeedEvent {
+  const PostSaved({
+    required this.userId,
+    required this.postId,
+  });
+  final String userId;
+  final int postId;
+
+  @override
+  List<Object> get props => [userId, postId];
+}
+
+class FeaturePostSaved extends FeedEvent {
+  const FeaturePostSaved({
+    required this.userId,
+    required this.postId,
+  });
+  final String userId;
+  final int postId;
+
+  @override
+  List<Object> get props => [userId, postId];
+}
+
+class PostDeleted extends FeedEvent {
+  const PostDeleted({
+    required this.postId,
+  });
+  final int postId;
+
+  @override
+  List<Object> get props => [postId];
 }

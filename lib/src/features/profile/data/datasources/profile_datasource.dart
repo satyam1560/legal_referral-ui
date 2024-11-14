@@ -4,6 +4,7 @@ import 'package:injectable/injectable.dart';
 import 'package:legal_referral_ui/src/core/config/config.dart';
 import 'package:legal_referral_ui/src/core/network/network.dart';
 import 'package:legal_referral_ui/src/features/auth/domain/domain.dart';
+import 'package:legal_referral_ui/src/features/firm/domain/domain.dart';
 import 'package:legal_referral_ui/src/features/profile/data/data.dart';
 import 'package:legal_referral_ui/src/features/profile/domain/domain.dart';
 
@@ -292,6 +293,30 @@ class ProfileDataSource {
         userId,
         educationId,
       );
+      return res;
+    } catch (_) {
+      rethrow;
+    }
+  }
+
+  Future<ResponseMsg?> unSaveFeaturePost({
+    required int postId,
+  }) async {
+    try {
+      final res = await _apiClient.unSaveFeaturePost(
+        postId,
+      );
+      return res;
+    } catch (_) {
+      rethrow;
+    }
+  }
+
+  Future<List<FeaturePost>> fetchFeaturePosts({
+    required String userId,
+  }) async {
+    try {
+      final res = await _apiClient.fetchFeaturePosts(userId);
       return res;
     } catch (_) {
       rethrow;

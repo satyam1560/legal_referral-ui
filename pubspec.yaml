@@ -1,26 +1,29 @@
 name: legal_referral_ui
 description: "A new Flutter project."
-publish_to: 'none'
+publish_to: "none"
 
 version: 1.0.0+1
 
 environment:
-  sdk: '>=3.3.4 <4.0.0'
+  sdk: ^3.5.3
 
 dependencies:
+  android_id: ^0.4.0
   animated_toggle_switch: ^0.8.0
   any_link_preview: ^3.0.2
+  app_links: ^6.3.2
   appinio_social_share: ^0.3.1
   bloc_concurrency: ^0.2.3
   bubble: ^1.2.1
   cached_network_image: ^3.3.1
-  camerawesome: ^2.0.1
-  carousel_slider: ^4.2.1
+  camerawesome: ^2.1.0
+  carousel_slider: ^5.0.0
   collection: ^1.18.0
   crypto: ^3.0.3
   cupertino_icons: ^1.0.2
   dartz: ^0.10.1
-  dio: ^5.4.0
+  device_info_plus: ^10.1.2
+  dio: ^5.7.0
   dots_indicator: ^2.1.2
   dropdown_button2: ^2.3.9
   equatable: ^2.0.5
@@ -28,6 +31,7 @@ dependencies:
   firebase_analytics: ^11.0.0
   firebase_auth: ^5.0.0
   firebase_core: ^3.0.0
+  firebase_messaging: ^15.1.2
   firebase_performance: ^0.10.0
   firebase_storage: ^12.0.0
   flutter:
@@ -41,6 +45,7 @@ dependencies:
   flutter_facebook_auth: ^6.0.4
   flutter_layout_grid: ^2.0.6
   flutter_linkify: ^6.0.0
+  flutter_local_notifications: ^17.2.3
   flutter_polls: ^0.1.6
   flutter_rating_bar: ^4.0.1
   flutter_screenutil: ^5.9.0
@@ -51,8 +56,8 @@ dependencies:
   get_it: ^7.6.7
   go_router: ^14.0.1
   google_sign_in: ^6.2.1
-  grouped_list: ^5.1.2
-  image_cropper: ^7.0.5
+  grouped_list: ^6.0.0
+  image_cropper: ^8.0.2
   image_network: ^2.5.6
   image_picker: ^1.0.7
   injectable: ^2.3.5
@@ -60,15 +65,16 @@ dependencies:
   intl: ^0.19.0
   introduction_screen: ^3.1.12
   json_annotation: ^4.8.1
-  linkedin_login: ^3.0.2
+  linkedin_login: ^3.0.5
   logger: ^2.2.0
   open_filex: ^4.4.0
   path: ^1.9.0
   path_provider: ^2.1.3
   pdfx: ^2.6.0
-  pinput: ^4.0.0
+  pinput: ^5.0.0
   pretty_dio_logger: ^1.3.1
   retrofit: ^4.1.0
+  share_plus: ^10.0.2
   shared_preferences: ^2.2.2
   shimmer: ^3.0.0
   signin_with_linkedin: ^1.0.0
@@ -78,9 +84,10 @@ dependencies:
   toastification: ^2.0.0
   universal_platform: ^1.0.0+1
   url_launcher: ^6.2.2
-  url_strategy: ^0.2.0
+  url_strategy: ^0.3.0
   uuid: ^4.3.3
   video_player: ^2.8.7
+  video_thumbnail: ^0.5.3
   web_socket_channel: ^3.0.0
 
 dev_dependencies:
@@ -91,11 +98,12 @@ dev_dependencies:
   freezed: ^2.4.6
   injectable_generator: ^2.4.1
   json_serializable: ^6.7.1
-  retrofit_generator: ^8.0.6
+  retrofit_generator: ^9.1.2
 
 dependency_overrides:
-  dio: ^5.4.0
+  # dio: ^5.4.0
   http: ^1.2.0
+  rxdart: ^0.27.7
 
 flutter:
   uses-material-design: true

@@ -45,6 +45,11 @@ class _ProfilePageState extends State<ProfilePage> {
       backgroundColor: LegalReferralColors.primaryBackground,
       appBar: AppBar(
         backgroundColor: Colors.white,
+        title: Text(
+          'Your Profile',
+          style: Theme.of(context).textTheme.headlineMedium,
+        ),
+        titleSpacing: 0,
       ),
       body: BlocConsumer<ProfileBloc, ProfileState>(
         bloc: _profileBloc,
@@ -113,7 +118,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                           IconStringConstants.favIcon,
                                         ),
                                         Text(
-                                          '4.3 by 433 attorneys',
+                                          '4.7 by 433 attorneys',
                                           style: Theme.of(context)
                                               .textTheme
                                               .bodyLarge
@@ -140,8 +145,6 @@ class _ProfilePageState extends State<ProfilePage> {
                               SizedBox(
                                 height: 8.h,
                               ),
-
-                              // connection buttons
                               if (!isCurrentUser)
                                 ConnectionButtons(
                                   userId: widget.userId,
@@ -210,7 +213,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           profileBloc: _profileBloc,
                           isCurrentUser: isCurrentUser,
                         ),
-                        const FeaturedSection(),
+                        const FeaturedPostsSection(),
                         CustomCard(
                           onTap: () {},
                           title: 'Activity',

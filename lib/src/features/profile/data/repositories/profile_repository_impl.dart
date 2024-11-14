@@ -6,6 +6,7 @@ import 'package:injectable/injectable.dart';
 import 'package:legal_referral_ui/src/core/config/config.dart';
 import 'package:legal_referral_ui/src/core/network/network.dart';
 import 'package:legal_referral_ui/src/features/auth/domain/entities/app_user.dart';
+import 'package:legal_referral_ui/src/features/firm/domain/domain.dart';
 import 'package:legal_referral_ui/src/features/profile/data/data.dart';
 import 'package:legal_referral_ui/src/features/profile/domain/domain.dart';
 
@@ -444,6 +445,46 @@ class ProfileRepositoryImpl extends ProfileRepository {
       final res = await _profileDataSource.deleteEducation(
         userId: userId,
         educationId: educationId,
+      );
+      return Right(res);
+    } on DioException catch (error) {
+      final dioError = DioExceptions.fromDioError(error);
+      return Left(
+        Failure(
+          statusCode: dioError.statusCode,
+          message: dioError.message,
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<FeaturePost>>> fetchFeaturePosts({
+    required String userId,
+  }) async {
+    try {
+      final res = await _profileDataSource.fetchFeaturePosts(
+        userId: userId,
+      );
+      return Right(res);
+    } on DioException catch (error) {
+      final dioError = DioExceptions.fromDioError(error);
+      return Left(
+        Failure(
+          statusCode: dioError.statusCode,
+          message: dioError.message,
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Either<Failure, ResponseMsg?>> unSaveFeaturePost({
+    required int postId,
+  }) async {
+    try {
+      final res = await _profileDataSource.unSaveFeaturePost(
+        postId: postId,
       );
       return Right(res);
     } on DioException catch (error) {

@@ -7,7 +7,9 @@ import 'package:legal_referral_ui/src/features/auth/domain/domain.dart';
 import 'package:legal_referral_ui/src/features/auth/presentation/presentation.dart';
 import 'package:legal_referral_ui/src/features/feed/data/data.dart';
 import 'package:legal_referral_ui/src/features/feed/domain/domain.dart';
+import 'package:legal_referral_ui/src/features/post/data/data.dart';
 import 'package:legal_referral_ui/src/features/post/domain/domain.dart';
+import 'package:legal_referral_ui/src/features/saved_posts/domain/domain.dart';
 import 'package:stream_transform/stream_transform.dart';
 
 part 'feed_event.dart';
@@ -28,9 +30,11 @@ class FeedBloc extends Bloc<FeedEvent, FeedState> {
   FeedBloc({
     required FeedUsecase feedUsecase,
     required PostUsecase postUsecase,
+    required SavedPostsUsecase savedPostUseCase,
     required AuthBloc authBloc,
   })  : _feedUsecase = feedUsecase,
         _postUsecase = postUsecase,
+        _savedPostUseCase = savedPostUseCase,
         _authBloc = authBloc,
         super(FeedState.initial()) {
     on<FeedsFetched>(
@@ -38,8 +42,8 @@ class FeedBloc extends Bloc<FeedEvent, FeedState> {
       transformer: _throttleDroppable(_throttleDuration),
     );
     on<FeedRefreshed>(_onFeedRefreshed);
-    on<PostLiked>(_onPostLiked);
-    on<PostUnliked>(_onPostUnliked);
+    on<FeedPostLiked>(_onFeedPostLiked);
+    on<FeedPostUnliked>(_onFeedPostUnliked);
     on<PostLikedUsersFetched>(_onPostLikedUsersFetched);
     on<Commented>(_onCommented);
     on<CommentsFetched>(_onCommentsFetched);
@@ -47,10 +51,16 @@ class FeedBloc extends Bloc<FeedEvent, FeedState> {
     on<CommentUnliked>(_onCommentUnliked);
     on<FeedDetailsInitialized>(_onFeedDetailsInitialized);
     on<ParentCommentIdChanged>(_onParentCommentIdChanged);
+    on<PostLikesAndCommentsCountFetched>(_onPostLikesAndCommentsCountFetched);
+    on<PostIsLikedFetched>(_onIsLikedPostFetched);
+    on<PostSaved>(_onPostSaved);
+    on<FeaturePostSaved>(_onFeaturePostSaved);
+    on<PostDeleted>(_onPostDeleted);
   }
 
   final FeedUsecase _feedUsecase;
   final PostUsecase _postUsecase;
+  final SavedPostsUsecase _savedPostUseCase;
   final AuthBloc _authBloc;
 
   Future<void> _onFeedsFetched(
@@ -125,84 +135,164 @@ class FeedBloc extends Bloc<FeedEvent, FeedState> {
     add(FeedsFetched(userId: event.userId));
   }
 
-  Future<void> _onPostLiked(
-    PostLiked event,
+  Future<void> _onFeedPostLiked(
+    FeedPostLiked event,
     Emitter<FeedState> emit,
   ) async {
-    final response = await _postUsecase.likePost(
-      postId: event.postId,
-    );
+    Feed? feed;
 
-    response.fold(
-      (failure) {},
-      (_) {
-        final index = event.index;
+    if (event.isFromeDetails) {
+      feed = state.feed;
+    } else {
+      feed = state.feeds[event.index];
+    }
+    final feeds = List.of(state.feeds);
 
-        final updatedFeeds = List.of(state.feeds);
-        Feed? updatedFeed;
+    if (feed != null) {
+      final feedPost = feed.feedPost;
+      final isCurrentlyLiked = feedPost?.isLiked ?? false;
+      final updatedLikesCount = isCurrentlyLiked
+          ? (feedPost?.likesCount ?? 0) - 1
+          : (feedPost?.likesCount ?? 0) + 1;
 
-        if (index >= 0 && index < updatedFeeds.length) {
-          final feed = updatedFeeds[index];
-          updatedFeed = feed?.copyWith(
-            likesCount:
-                feed.isLiked ? feed.likesCount - 1 : feed.likesCount + 1,
-            isLiked: !feed.isLiked,
-          );
-          updatedFeeds[index] = updatedFeed;
-        }
+      final updatedFeed = feed.copyWith(
+        feedPost: feedPost?.copyWith(
+          likesCount: updatedLikesCount,
+          isLiked: !isCurrentlyLiked,
+        ),
+      );
 
-        emit(
-          state.copyWith(
-            feeds: updatedFeeds,
-            feed: updatedFeed,
-            status: FeedStatus.success,
-            postLikedUsers: [
-              _authBloc.state.user,
-              ...state.postLikedUsers,
-            ],
+      if (event.index >= 0 && event.index < feeds.length) {
+        feeds[event.index] = updatedFeed;
+      }
+
+      emit(
+        state.copyWith(
+          feeds: feeds,
+          feed: updatedFeed,
+          status: FeedStatus.success,
+          postLikedUsers: [
+            _authBloc.state.user,
+            ...state.postLikedUsers,
+          ],
+        ),
+      );
+
+      final likePostReq = LikePostReq(
+        userId: event.userId,
+        senderId: event.senderId,
+        postId: event.postId,
+      );
+
+      final response = await _postUsecase.likePost(likePostReq: likePostReq);
+
+      // Revert the change if the API call fails
+      if (response.isLeft()) {
+        final revertedLikesCount = !isCurrentlyLiked
+            ? (feedPost?.likesCount ?? 0) - 1
+            : (feedPost?.likesCount ?? 0) + 1;
+
+        final revertedFeed = feed.copyWith(
+          feedPost: feedPost?.copyWith(
+            likesCount: revertedLikesCount,
+            isLiked: isCurrentlyLiked,
           ),
         );
-      },
-    );
-  }
 
-  Future<void> _onPostUnliked(
-    PostUnliked event,
-    Emitter<FeedState> emit,
-  ) async {
-    final response = await _postUsecase.unlikePost(
-      postId: event.postId,
-    );
-
-    response.fold(
-      (failure) {},
-      (_) {
-        final index = event.index;
-
-        final feeds = List.of(state.feeds);
-        Feed? updatedFeed;
-        if (index >= 0 && index < feeds.length) {
-          final feed = feeds[index];
-          updatedFeed = feed?.copyWith(
-            likesCount:
-                feed.isLiked ? feed.likesCount - 1 : feed.likesCount + 1,
-            isLiked: !feed.isLiked,
-          );
-          feeds[index] = updatedFeed;
+        if (event.index >= 0 && event.index < feeds.length) {
+          feeds[event.index] = revertedFeed;
         }
-
-        final postLikesUsers = List.of(state.postLikedUsers);
 
         emit(
           state.copyWith(
             feeds: feeds,
-            feed: updatedFeed,
-            postLikedUsers: postLikesUsers..removeAt(0),
-            status: FeedStatus.success,
+            feed: revertedFeed,
+            status: FeedStatus.failure,
           ),
         );
-      },
-    );
+      }
+    }
+  }
+
+  Future<void> _onFeedPostUnliked(
+    FeedPostUnliked event,
+    Emitter<FeedState> emit,
+  ) async {
+    Feed? feed;
+
+    if (event.isFromeDetails) {
+      feed = state.feed;
+    } else {
+      feed = state.feeds[event.index];
+    }
+    final feeds = List.of(state.feeds);
+
+    if (feed != null) {
+      final feedPost = feed.feedPost;
+      final isCurrentlyLiked = feedPost?.isLiked ?? false;
+      final updatedLikesCount = isCurrentlyLiked
+          ? (feedPost?.likesCount ?? 0) - 1
+          : (feedPost?.likesCount ?? 0) + 1;
+
+      // Create an updated feed with the new like state (unlike action)
+      final updatedFeed = feed.copyWith(
+        feedPost: feedPost?.copyWith(
+          likesCount: updatedLikesCount,
+          isLiked: !isCurrentlyLiked,
+        ),
+      );
+
+      // Update the specific feed in the list
+      if (event.index >= 0 && event.index < feeds.length) {
+        feeds[event.index] = updatedFeed;
+      }
+
+      final postLikedUsers = List.of(state.postLikedUsers);
+      if (postLikedUsers.isNotEmpty) {
+        postLikedUsers.removeAt(0);
+      }
+
+      emit(
+        state.copyWith(
+          feeds: feeds,
+          feed: updatedFeed,
+          postLikedUsers: postLikedUsers,
+          status: FeedStatus.success,
+        ),
+      );
+
+      final response = await _postUsecase.unlikePost(postId: event.postId);
+
+      // Revert the change if the API call fails
+      if (response.isLeft()) {
+        final revertedLikesCount = !isCurrentlyLiked
+            ? (feedPost?.likesCount ?? 0) - 1
+            : (feedPost?.likesCount ?? 0) + 1;
+
+        final revertedFeed = feed.copyWith(
+          feedPost: feedPost?.copyWith(
+            likesCount: revertedLikesCount,
+            isLiked: isCurrentlyLiked,
+          ),
+        );
+
+        if (event.index >= 0 && event.index < feeds.length) {
+          feeds[event.index] = revertedFeed;
+        }
+
+        emit(
+          state.copyWith(
+            feeds: feeds,
+            feed: revertedFeed,
+            postLikedUsers: [
+              _authBloc.state.user,
+              ...postLikedUsers,
+            ],
+            status: FeedStatus.failure,
+          ),
+        );
+      }
+    }
   }
 
   Future<void> _onPostLikedUsersFetched(
@@ -263,7 +353,9 @@ class FeedBloc extends Bloc<FeedEvent, FeedState> {
         if (index >= 0 && index < feeds.length) {
           final feed = feeds[index];
           updatedFeed = feed?.copyWith(
-            commentsCount: feed.commentsCount + 1,
+            feedPost: feed.feedPost?.copyWith(
+              commentsCount: feed.feedPost!.commentsCount + 1,
+            ),
           );
           feeds[index] = updatedFeed;
         }
@@ -420,6 +512,170 @@ class FeedBloc extends Bloc<FeedEvent, FeedState> {
       state.copyWith(
         parentCommentId: event.parentCommentId,
       ),
+    );
+  }
+
+  Future<void> _onPostLikesAndCommentsCountFetched(
+    PostLikesAndCommentsCountFetched event,
+    Emitter<FeedState> emit,
+  ) async {
+    emit(
+      state.copyWith(
+        status: FeedStatus.loading,
+      ),
+    );
+
+    final response = await _feedUsecase.fetchPostLikesAndCommentsCount(
+      postId: event.postId,
+    );
+
+    response.fold(
+      (failure) {
+        emit(
+          state.copyWith(
+            status: FeedStatus.failure,
+            failure: failure,
+          ),
+        );
+      },
+      (res) {
+        emit(
+          state.copyWith(
+            status: FeedStatus.success,
+            feed: state.feed?.copyWith(
+              feedPost: state.feed?.feedPost?.copyWith(
+                likesCount: res.likes,
+                commentsCount: res.comments,
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _onIsLikedPostFetched(
+    PostIsLikedFetched event,
+    Emitter<FeedState> emit,
+  ) async {
+    final response = await _feedUsecase.isPostLiked(
+      postId: event.postId,
+    );
+
+    response.fold(
+      (failure) {
+        emit(
+          state.copyWith(
+            status: FeedStatus.failure,
+            failure: failure,
+          ),
+        );
+      },
+      (isLiked) {
+        emit(
+          state.copyWith(
+            status: FeedStatus.success,
+            feed: state.feed?.copyWith(
+              feedPost: state.feed?.feedPost?.copyWith(
+                isLiked: isLiked,
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _onPostSaved(
+    PostSaved event,
+    Emitter<FeedState> emit,
+  ) async {
+    final response = await _savedPostUseCase.savePost(
+      userId: event.userId,
+      postId: event.postId,
+    );
+
+    response.fold(
+      (failure) {
+        emit(
+          state.copyWith(
+            feedActionsStatus: FeedActionsStatus.failure,
+            failure: failure,
+          ),
+        );
+      },
+      (_) {
+        emit(
+          state.copyWith(
+            feedActionsStatus: FeedActionsStatus.success,
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _onFeaturePostSaved(
+    FeaturePostSaved event,
+    Emitter<FeedState> emit,
+  ) async {
+    final saveFeaturePostReq = SaveFeaturePostReq(
+      userId: event.userId,
+      postId: event.postId,
+    );
+
+    final response = await _feedUsecase.saveFeaturePost(
+      saveFeaturePostReq: saveFeaturePostReq,
+    );
+
+    response.fold(
+      (failure) {
+        emit(
+          state.copyWith(
+            feedActionsStatus: FeedActionsStatus.failure,
+            failure: failure,
+          ),
+        );
+      },
+      (_) {
+        emit(
+          state.copyWith(
+            feedActionsStatus: FeedActionsStatus.success,
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _onPostDeleted(
+    PostDeleted event,
+    Emitter<FeedState> emit,
+  ) async {
+    final response = await _postUsecase.deletePost(
+      postId: event.postId,
+    );
+
+    response.fold(
+      (failure) {
+        emit(
+          state.copyWith(
+            feedActionsStatus: FeedActionsStatus.failure,
+            failure: failure,
+          ),
+        );
+      },
+      (_) {
+        final feeds = List.of(state.feeds);
+        feeds.removeWhere(
+          (feed) => feed?.feedPost?.postId == event.postId,
+        );
+
+        emit(
+          state.copyWith(
+            feedActionsStatus: FeedActionsStatus.success,
+            feeds: feeds,
+          ),
+        );
+      },
     );
   }
 }

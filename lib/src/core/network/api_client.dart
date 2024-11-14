@@ -2,6 +2,9 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:legal_referral_ui/src/core/config/config.dart';
+import 'package:legal_referral_ui/src/features/account/domain/domain.dart';
+import 'package:legal_referral_ui/src/features/advertisement/data/data.dart';
+import 'package:legal_referral_ui/src/features/advertisement/domain/domain.dart';
 import 'package:legal_referral_ui/src/features/auth/data/data.dart';
 import 'package:legal_referral_ui/src/features/auth/domain/domain.dart';
 import 'package:legal_referral_ui/src/features/chat/data/data.dart';
@@ -10,12 +13,18 @@ import 'package:legal_referral_ui/src/features/discussion/data/data.dart';
 import 'package:legal_referral_ui/src/features/discussion/domain/domain.dart';
 import 'package:legal_referral_ui/src/features/feed/data/data.dart';
 import 'package:legal_referral_ui/src/features/feed/domain/domain.dart';
+import 'package:legal_referral_ui/src/features/firm/domain/domain.dart';
 import 'package:legal_referral_ui/src/features/network/data/data.dart';
 import 'package:legal_referral_ui/src/features/network/domain/domain.dart';
+import 'package:legal_referral_ui/src/features/notifications/domain/domain.dart';
+import 'package:legal_referral_ui/src/features/post/data/data.dart';
+import 'package:legal_referral_ui/src/features/post/domain/domain.dart';
 import 'package:legal_referral_ui/src/features/profile/data/data.dart';
 import 'package:legal_referral_ui/src/features/profile/domain/domain.dart';
 import 'package:legal_referral_ui/src/features/referral/data/data.dart';
 import 'package:legal_referral_ui/src/features/referral/domain/domain.dart';
+import 'package:legal_referral_ui/src/features/saved_posts/data/data.dart';
+import 'package:legal_referral_ui/src/features/saved_posts/domain/domain.dart';
 import 'package:legal_referral_ui/src/features/wizard/data/data.dart';
 import 'package:legal_referral_ui/src/features/wizard/domain/domain.dart';
 import 'package:retrofit/retrofit.dart';
@@ -31,6 +40,28 @@ abstract class APIClient {
 
   @GET('/')
   Future<String> ping();
+
+  @POST('/sign-in')
+  Future<EmailAuthRes> signInWithEmail(
+    @Body() EmailSignInReq emailSignInReq,
+  );
+
+  @POST('/sign-up')
+  @MultiPart()
+  Future<EmailAuthRes> signUpWithEmail({
+    @Part(name: 'email') required String email,
+    @Part(name: 'password') required String password,
+    @Part(name: 'first_name') required String firstName,
+    @Part(name: 'last_name') required String lastName,
+    @Part(name: 'mobile') String? mobile,
+    @Part(name: 'avatar_url') String? avatarUrl,
+    @Part(name: 'avatar_file') File? avatarFile,
+  });
+
+  @POST('/refresh-token')
+  Future<RefreshTokenRes> refreshToken(
+    @Body() RefreshTokenReq refreshTokenReq,
+  );
 
   @POST('/custom-signup')
   Future<String?> customSignUp(
@@ -117,11 +148,28 @@ abstract class APIClient {
     @Path('userId') String userId,
   );
 
+  @POST('/firms')
+  @MultiPart()
+  Future<Firm> addFirm(
+    @Part(name: 'name') String name,
+    @Part(name: 'owner_user_id') String ownerId,
+    @Part(name: 'org_type') String orgType,
+    @Part(name: 'file') File file,
+    @Part(name: 'website') String website,
+    @Part(name: 'location') String location,
+    @Part(name: 'about') String about,
+  );
+
   @GET('/firms')
   Future<List<Firm?>> searchFirm(
     @Query('query') String query,
     @Query('limit') int limit,
     @Query('offset') int offset,
+  );
+
+  @GET('/firms/owner/{ownerId}')
+  Future<List<Firm>> fetchMyFirms(
+    @Path('ownerId') String ownerId,
   );
 
   @PUT('/users/info')
@@ -292,6 +340,13 @@ abstract class APIClient {
     @Query('offset') int offset,
   );
 
+  @GET('/search/posts')
+  Future<List<Post>> searchPosts(
+    @Query('query') String query,
+    @Query('limit') int limit,
+    @Query('offset') int offset,
+  );
+
   // chat
   @GET('/chat/{room_id}/messages')
   Future<List<ChatMessage>> fetchMessages(
@@ -426,8 +481,18 @@ abstract class APIClient {
     @Part(name: 'files') List<File> files,
   );
 
+  @GET('/posts/{postId}')
+  Future<Post> fetchPost(
+    @Path('postId') int postId,
+  );
+
+  @DELETE('/posts/{postId}')
+  Future<ResponseMsg> deletePost(
+    @Path('postId') int postId,
+  );
+
   // feed
-  @GET('/feeds/{userId}')
+  @GET('/v2/feeds/{userId}')
   Future<List<Feed?>> fetchFeeds(
     @Path('userId') String userId,
     @Query('limit') int limit,
@@ -437,6 +502,7 @@ abstract class APIClient {
   @POST('/posts/{postId}/like')
   Future<void> likePost(
     @Path('postId') int postId,
+    @Body() LikePostReq likePostReq,
   );
 
   @DELETE('/posts/{postId}/like')
@@ -471,9 +537,16 @@ abstract class APIClient {
   );
 
   // discussion
+
   @POST('/discussions')
   Future<Discussion?> createDiscussion(
     @Body() CreateDiscussionReq discussion,
+  );
+
+  @PUT('/discussions/{discussionId}/topic')
+  Future<ResponseMsg?> updateDiscussionTopic(
+    @Path('discussionId') int discussionId,
+    @Body() UpdateDiscussionTopicReq updateDiscussionTopicReq,
   );
 
   @POST('/discussions/{discussionId}/invite')
@@ -518,5 +591,98 @@ abstract class APIClient {
   @GET('/discussions/{discussionId}/participants')
   Future<List<AppUser?>> fetchDiscussionParticipants(
     @Path('discussionId') int discussionId,
+  );
+
+  @GET('/discussions/{discussionId}/uninvited')
+  Future<List<AppUser?>> fetchDiscussionUninvitedUsers(
+    @Path('discussionId') int discussionId,
+  );
+
+  @POST('/ads')
+  @MultiPart()
+  Future<ResponseMsg?> createAd(
+    @Part(name: 'ad_type') String adType,
+    @Part(name: 'title') String title,
+    @Part(name: 'description') String description,
+    @Part(name: 'link') String link,
+    @Part(name: 'payment_cycle') String paymentCycle,
+    @Part(name: 'author_id') String authorId,
+    @Part(name: 'start_date') String startDate,
+    @Part(name: 'end_date') String endDate,
+    @Part(name: 'files') List<File> media,
+  );
+
+  @GET('/ads/playing')
+  Future<List<Ad?>> fetchPlayingAds();
+
+  @GET('/ads/expired')
+  Future<List<Ad?>> fetchExpiredAds();
+
+  @PUT('/ads/{adId}/extend')
+  Future<Ad?> extendAdPeriod(
+    @Path('adId') int adId,
+    @Body() ExtendAdReq extendAdReq,
+  );
+
+  @POST('/saved-posts')
+  Future<ResponseMsg> savePost(
+    @Body() SavePostReq savePostReq,
+  );
+
+  @DELETE('/saved-posts/{savedPostId}')
+  Future<ResponseMsg> unsavePost(
+    @Path('savedPostId') int savedPostId,
+  );
+
+  @GET('/saved-posts/{userId}')
+  Future<List<SavedPost>> fetchSavedPosts(
+    @Path('userId') String userId,
+  );
+
+  @GET('/posts/{post_id}/likes-comments-count')
+  Future<PostLikesAndCommentsCount> fetchPostLikesAndCommentsCount(
+    @Path('post_id') int postId,
+  );
+
+  @GET('/posts/{post_id}/is-liked')
+  Future<bool> isPostLiked(
+    @Path('post_id') int postId,
+  );
+
+  @POST('/feature-posts')
+  Future<ResponseMsg> saveFeaturePost(
+    @Body() SaveFeaturePostReq saveFeaturePostReq,
+  );
+
+  @DELETE('/feature-posts/{postId}')
+  Future<ResponseMsg> unSaveFeaturePost(
+    @Path('postId') int postId,
+  );
+
+  @GET('/feature-posts/{userId}')
+  Future<List<FeaturePost>> fetchFeaturePosts(
+    @Path('userId') String userId,
+  );
+
+  // FAQ
+  @GET('/faqs')
+  Future<List<FAQ>> fetchFAQs();
+
+  @POST('/faqs')
+  Future<FAQ> createFAQ(
+    @Body() FAQ faq,
+  );
+
+  @POST('/device-details')
+  Future<void> saveDeviceDetails(
+    @Body() DeviceDetails deviceDetails,
+  );
+
+  // notifications
+  @GET('/notifications/{userId}')
+  Future<List<Notification>> fetchNotifications(
+    @Path('userId') String userId,
+    @Query('limit') int limit,
+    @Query('offset') int offset,
   );
 }

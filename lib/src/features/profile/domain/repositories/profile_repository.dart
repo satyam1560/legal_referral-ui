@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:dartz/dartz.dart';
 import 'package:legal_referral_ui/src/core/config/config.dart';
 import 'package:legal_referral_ui/src/features/auth/domain/domain.dart';
+import 'package:legal_referral_ui/src/features/firm/domain/domain.dart';
 import 'package:legal_referral_ui/src/features/profile/data/data.dart';
 import 'package:legal_referral_ui/src/features/profile/domain/domain.dart';
 
@@ -105,5 +106,13 @@ abstract class ProfileRepository {
   Future<Either<Failure, ResponseMsg?>> deleteEducation({
     required String userId,
     required int educationId,
+  });
+
+  Future<Either<Failure, ResponseMsg?>> unSaveFeaturePost({
+    required int postId,
+  });
+
+  Future<Either<Failure, List<FeaturePost>>> fetchFeaturePosts({
+    required String userId,
   });
 }

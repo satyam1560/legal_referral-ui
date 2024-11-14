@@ -1,16 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:legal_referral_ui/src/core/common_widgets/widgets.dart';
+import 'package:legal_referral_ui/src/features/account/presentation/presentation.dart';
+import 'package:legal_referral_ui/src/features/advertisement/domain/domain.dart';
+import 'package:legal_referral_ui/src/features/advertisement/presentation/presentation.dart';
 import 'package:legal_referral_ui/src/features/auth/presentation/presentation.dart';
 import 'package:legal_referral_ui/src/features/chat/presentation/presentation.dart';
 import 'package:legal_referral_ui/src/features/discussion/domain/domain.dart';
 import 'package:legal_referral_ui/src/features/discussion/presentation/presentation.dart';
 import 'package:legal_referral_ui/src/features/feed/presentation/presentation.dart';
+import 'package:legal_referral_ui/src/features/firm/domain/domain.dart';
+import 'package:legal_referral_ui/src/features/firm/presentation/presentation.dart';
 import 'package:legal_referral_ui/src/features/network/presentation/presentation.dart';
+import 'package:legal_referral_ui/src/features/notifications/presentation/presentation.dart';
 import 'package:legal_referral_ui/src/features/post/presentation/presentation.dart';
 import 'package:legal_referral_ui/src/features/profile/presentation/presentation.dart';
 import 'package:legal_referral_ui/src/features/referral/domain/domain.dart';
 import 'package:legal_referral_ui/src/features/referral/presentation/presentation.dart';
+import 'package:legal_referral_ui/src/features/saved_posts/presentation/presentation.dart';
 import 'package:legal_referral_ui/src/features/search/presentation/presentation.dart';
 import 'package:legal_referral_ui/src/features/wizard/presentation/presentation.dart';
 
@@ -311,6 +318,19 @@ class AppRouter {
         ],
       ),
       GoRoute(
+        path: '/recommendation-swipe-cards',
+        name: SwipeRecommendationsPage.name,
+        parentNavigatorKey: _rootNavigatorKey,
+        pageBuilder: (context, state) => CustomTransitionPage(
+          child: const SwipeRecommendationsPage(),
+          transitionDuration: const Duration(
+            milliseconds: _routeTransitionDuration,
+          ),
+          transitionsBuilder: (_, a, __, c) =>
+              FadeTransition(opacity: a, child: c),
+        ),
+      ),
+      GoRoute(
         path: '/profile/:userId',
         name: ProfilePage.name,
         parentNavigatorKey: _rootNavigatorKey,
@@ -324,6 +344,120 @@ class AppRouter {
           transitionsBuilder: (_, a, __, c) =>
               FadeTransition(opacity: a, child: c),
         ),
+      ),
+      GoRoute(
+        path: '/account',
+        name: AccountPage.name,
+        parentNavigatorKey: _rootNavigatorKey,
+        pageBuilder: (context, state) => CustomTransitionPage(
+          child: const AccountPage(),
+          transitionDuration: const Duration(
+            milliseconds: _routeTransitionDuration,
+          ),
+          transitionsBuilder: (_, a, __, c) =>
+              FadeTransition(opacity: a, child: c),
+        ),
+        routes: [
+          GoRoute(
+            path: 'my-law-firm',
+            name: MyLawFirmPage.name,
+            parentNavigatorKey: _rootNavigatorKey,
+            pageBuilder: (context, state) => CustomTransitionPage(
+              child: const MyLawFirmPage(),
+              transitionDuration: const Duration(
+                milliseconds: _routeTransitionDuration,
+              ),
+              transitionsBuilder: (_, a, __, c) =>
+                  FadeTransition(opacity: a, child: c),
+            ),
+            routes: [
+              GoRoute(
+                path: 'firm-page',
+                name: FirmPage.name,
+                parentNavigatorKey: _rootNavigatorKey,
+                pageBuilder: (context, state) => CustomTransitionPage(
+                  child: FirmPage(
+                    firm: state.extra as Firm,
+                  ),
+                  transitionDuration: const Duration(
+                    milliseconds: _routeTransitionDuration,
+                  ),
+                  transitionsBuilder: (_, a, __, c) =>
+                      FadeTransition(opacity: a, child: c),
+                ),
+              ),
+              GoRoute(
+                path: 'add-law-firm',
+                name: AddEditLawFirmPage.name,
+                parentNavigatorKey: _rootNavigatorKey,
+                pageBuilder: (context, state) => CustomTransitionPage(
+                  child: AddEditLawFirmPage(
+                    args: state.extra as AddEditLawFirmPageArgs,
+                  ),
+                  transitionDuration: const Duration(
+                    milliseconds: _routeTransitionDuration,
+                  ),
+                  transitionsBuilder: (_, a, __, c) =>
+                      FadeTransition(opacity: a, child: c),
+                ),
+              ),
+            ],
+          ),
+          GoRoute(
+            path: 'saved-posts',
+            name: SavedPostsPage.name,
+            parentNavigatorKey: _rootNavigatorKey,
+            pageBuilder: (context, state) => CustomTransitionPage(
+              child: const SavedPostsPage(),
+              transitionDuration: const Duration(
+                milliseconds: _routeTransitionDuration,
+              ),
+              transitionsBuilder: (_, a, __, c) =>
+                  FadeTransition(opacity: a, child: c),
+            ),
+          ),
+          GoRoute(
+            path: 'support-help',
+            name: SupportHelpPage.name,
+            parentNavigatorKey: _rootNavigatorKey,
+            pageBuilder: (context, state) => CustomTransitionPage(
+              child: const SupportHelpPage(),
+              transitionDuration: const Duration(
+                milliseconds: _routeTransitionDuration,
+              ),
+              transitionsBuilder: (_, a, __, c) =>
+                  FadeTransition(opacity: a, child: c),
+            ),
+            routes: [
+              GoRoute(
+                path: 'faq',
+                name: FAQPage.name,
+                parentNavigatorKey: _rootNavigatorKey,
+                pageBuilder: (context, state) => CustomTransitionPage(
+                  child: const FAQPage(),
+                  transitionDuration: const Duration(
+                    milliseconds: _routeTransitionDuration,
+                  ),
+                  transitionsBuilder: (_, a, __, c) =>
+                      FadeTransition(opacity: a, child: c),
+                ),
+              ),
+              GoRoute(
+                path: 'ask-us',
+                name: AskUsPage.name,
+                parentNavigatorKey: _rootNavigatorKey,
+                pageBuilder: (context, state) => CustomTransitionPage(
+                  child: const AskUsPage(),
+                  transitionDuration: const Duration(
+                    milliseconds: _routeTransitionDuration,
+                  ),
+                  transitionsBuilder: (_, a, __, c) =>
+                      FadeTransition(opacity: a, child: c),
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
       GoRoute(
         path: '/add-update-experience',
@@ -615,9 +749,6 @@ class AppRouter {
               FadeTransition(opacity: a, child: c),
         ),
       ),
-
-      // post
-
       GoRoute(
         path: '/addReferral',
         name: PostPage.name,
@@ -634,8 +765,6 @@ class AppRouter {
               FadeTransition(opacity: a, child: c),
         ),
       ),
-
-      // discuss
       GoRoute(
         path: '/discuss',
         name: DiscussPage.name,
@@ -679,6 +808,19 @@ class AppRouter {
         ),
       ),
       GoRoute(
+        path: '/discussion-invites',
+        name: DiscussionInvitesPage.name,
+        parentNavigatorKey: _rootNavigatorKey,
+        pageBuilder: (context, state) => CustomTransitionPage(
+          child: const DiscussionInvitesPage(),
+          transitionDuration: const Duration(
+            milliseconds: _routeTransitionDuration,
+          ),
+          transitionsBuilder: (_, a, __, c) =>
+              FadeTransition(opacity: a, child: c),
+        ),
+      ),
+      GoRoute(
         path: '/discussion/:discussionId/messages',
         name: DiscussionChatsPage.name,
         parentNavigatorKey: _rootNavigatorKey,
@@ -693,7 +835,6 @@ class AppRouter {
               FadeTransition(opacity: a, child: c),
         ),
       ),
-
       GoRoute(
         path: '/discussion/details/:discussionId',
         name: DiscussionDetailsPage.name,
@@ -705,6 +846,101 @@ class AppRouter {
           transitionDuration: const Duration(
             milliseconds: _routeTransitionDuration,
           ),
+          transitionsBuilder: (_, a, __, c) =>
+              FadeTransition(opacity: a, child: c),
+        ),
+      ),
+      GoRoute(
+        path: '/ad-page',
+        name: AdPage.name,
+        parentNavigatorKey: _rootNavigatorKey,
+        pageBuilder: (context, state) => CustomTransitionPage(
+          child: const AdPage(),
+          transitionDuration:
+              const Duration(milliseconds: _routeTransitionDuration),
+          transitionsBuilder: (_, a, __, c) =>
+              FadeTransition(opacity: a, child: c),
+        ),
+        routes: [
+          GoRoute(
+            path: 'create-ad',
+            name: CreateAdPage.name,
+            parentNavigatorKey: _rootNavigatorKey,
+            pageBuilder: (context, state) => CustomTransitionPage(
+              child: const CreateAdPage(),
+              transitionDuration:
+                  const Duration(milliseconds: _routeTransitionDuration),
+              transitionsBuilder: (_, a, __, c) =>
+                  FadeTransition(opacity: a, child: c),
+            ),
+          ),
+        ],
+      ),
+      GoRoute(
+        path: '/preview-ad',
+        name: PreviewAdPage.name,
+        parentNavigatorKey: _rootNavigatorKey,
+        pageBuilder: (context, state) => CustomTransitionPage(
+          child: PreviewAdPage(
+            args: state.extra as PreviewAdPageArgs,
+          ),
+          transitionDuration:
+              const Duration(milliseconds: _routeTransitionDuration),
+          transitionsBuilder: (_, a, __, c) =>
+              FadeTransition(opacity: a, child: c),
+        ),
+      ),
+      GoRoute(
+        path: '/payment-cycle',
+        name: PaymentCyclePage.name,
+        parentNavigatorKey: _rootNavigatorKey,
+        pageBuilder: (context, state) => CustomTransitionPage(
+          child: PaymentCyclePage(
+            adBloc: state.extra as AdBloc,
+          ),
+          transitionDuration:
+              const Duration(milliseconds: _routeTransitionDuration),
+          transitionsBuilder: (_, a, __, c) =>
+              FadeTransition(opacity: a, child: c),
+        ),
+      ),
+      GoRoute(
+        path: '/extend-ad',
+        name: ExtendAdPeriodPage.name,
+        parentNavigatorKey: _rootNavigatorKey,
+        pageBuilder: (context, state) => CustomTransitionPage(
+          child: ExtendAdPeriodPage(
+            ad: state.extra as Ad?,
+          ),
+          transitionDuration:
+              const Duration(milliseconds: _routeTransitionDuration),
+          transitionsBuilder: (_, a, __, c) =>
+              FadeTransition(opacity: a, child: c),
+        ),
+      ),
+      GoRoute(
+        path: '/post/:postId',
+        name: PostDetailsPage.name,
+        parentNavigatorKey: _rootNavigatorKey,
+        pageBuilder: (context, state) => CustomTransitionPage(
+          child: PostDetailsPage(
+            postId: int.tryParse(state.pathParameters['postId']!)!,
+          ),
+          transitionDuration:
+              const Duration(milliseconds: _routeTransitionDuration),
+          transitionsBuilder: (_, a, __, c) =>
+              FadeTransition(opacity: a, child: c),
+        ),
+      ),
+
+      GoRoute(
+        path: '/notifications',
+        name: NotificationsPage.name,
+        parentNavigatorKey: _rootNavigatorKey,
+        pageBuilder: (context, state) => CustomTransitionPage(
+          child: const NotificationsPage(),
+          transitionDuration:
+              const Duration(milliseconds: _routeTransitionDuration),
           transitionsBuilder: (_, a, __, c) =>
               FadeTransition(opacity: a, child: c),
         ),

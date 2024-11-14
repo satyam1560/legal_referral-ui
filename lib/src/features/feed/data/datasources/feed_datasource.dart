@@ -1,4 +1,5 @@
 import 'package:injectable/injectable.dart';
+import 'package:legal_referral_ui/src/core/config/config.dart';
 import 'package:legal_referral_ui/src/core/network/network.dart';
 import 'package:legal_referral_ui/src/features/auth/domain/domain.dart';
 import 'package:legal_referral_ui/src/features/feed/data/data.dart';
@@ -89,6 +90,56 @@ class FeedDatasource {
         commentId,
       );
     } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<PostLikesAndCommentsCount> fetchPostLikesAndCommentsCount({
+    required int postId,
+  }) async {
+    try {
+      final response = await _apiClient.fetchPostLikesAndCommentsCount(
+        postId,
+      );
+      return response;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<bool> isPostLiked({required int postId}) async {
+    try {
+      final response = await _apiClient.isPostLiked(
+        postId,
+      );
+      return response;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<ResponseMsg?> saveFeaturePost({
+    required SaveFeaturePostReq saveFeaturePostReq,
+  }) async {
+    try {
+      final res = await _apiClient.saveFeaturePost(
+        saveFeaturePostReq,
+      );
+      return res;
+    } catch (_) {
+      rethrow;
+    }
+  }
+
+  Future<ResponseMsg?> unsaveFeaturePost({
+    required int postId,
+  }) async {
+    try {
+      final res = await _apiClient.unSaveFeaturePost(
+        postId,
+      );
+      return res;
+    } catch (_) {
       rethrow;
     }
   }

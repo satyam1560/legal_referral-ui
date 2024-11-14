@@ -49,8 +49,8 @@ class ConnectionsFetched extends NetworkEvent {
   List<Object> get props => [userId, offset, limit];
 }
 
-class ConnectionReqSent extends NetworkEvent {
-  const ConnectionReqSent({
+class ConnectionRequestSent extends NetworkEvent {
+  const ConnectionRequestSent({
     required this.sendConnectionReq,
   });
 
@@ -106,4 +106,26 @@ class ConnectionChecked extends NetworkEvent {
 
   @override
   List<Object> get props => [userId, otherUserId];
+}
+
+class RecommendationIndexUpdated extends NetworkEvent {
+  const RecommendationIndexUpdated({
+    required this.index,
+  });
+
+  final int index;
+
+  @override
+  List<Object> get props => [index];
+}
+
+class CardSwipeDetected extends NetworkEvent {
+  const CardSwipeDetected({
+    required this.direction,
+  });
+
+  final CardSwiperDirection direction;
+
+  @override
+  List<Object> get props => [direction];
 }

@@ -9,19 +9,21 @@ import 'package:legal_referral_ui/src/features/auth/presentation/presentation.da
 import 'package:legal_referral_ui/src/features/feed/data/data.dart';
 import 'package:legal_referral_ui/src/features/feed/domain/domain.dart';
 import 'package:legal_referral_ui/src/features/feed/presentation/presentation.dart';
-import 'package:legal_referral_ui/src/features/post/domain/domain.dart';
 import 'package:toastification/toastification.dart';
 
+// TODO: Check if we can remove this feed details page
 class FeedDetailsPageArgs {
   FeedDetailsPageArgs({
     required this.feedBloc,
     required this.feed,
     required this.index,
+    this.fetchLikesAndCommentsCount = false,
   });
+
   final FeedBloc feedBloc;
   final Feed? feed;
-
   final int index;
+  final bool fetchLikesAndCommentsCount;
 }
 
 class FeedDetailsPage extends StatefulWidget {
@@ -43,18 +45,33 @@ class _FeedDetailsPageState extends State<FeedDetailsPage> {
 
   @override
   void initState() {
-    widget.args.feedBloc.add(
+    final args = widget.args;
+    args.feedBloc.add(
       FeedDetailsInitialized(
         feed: widget.args.feed,
       ),
     );
+
+    final postId = args.feed?.feedPost?.postId;
+    if (postId != null && args.fetchLikesAndCommentsCount) {
+      args.feedBloc.add(
+        PostLikesAndCommentsCountFetched(
+          postId: postId,
+        ),
+      );
+
+      args.feedBloc.add(
+        PostIsLikedFetched(
+          postId: postId,
+        ),
+      );
+    }
+
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    final post = widget.args.feed?.post;
-
     return Scaffold(
       appBar: AppBar(),
       backgroundColor: LegalReferralColors.containerWhite500,
@@ -73,6 +90,7 @@ class _FeedDetailsPageState extends State<FeedDetailsPage> {
             }
           },
           builder: (context, state) {
+            final feedPost = state.feed?.feedPost;
             return Column(
               children: [
                 Expanded(
@@ -82,12 +100,12 @@ class _FeedDetailsPageState extends State<FeedDetailsPage> {
                       children: [
                         FeedTile(
                           feed: widget.args.feed,
-                          isLiked: state.feed?.isLiked ?? false,
-                          likesCount: state.feed?.likesCount ?? 0,
-                          commentsCount: state.feed?.commentsCount ?? 0,
+                          isLiked: feedPost?.isLiked ?? false,
+                          likesCount: feedPost?.likesCount ?? 0,
+                          commentsCount: feedPost?.commentsCount ?? 0,
                           onLikePressed: () => _onLikePressed(
                             widget.args.feed,
-                            state.feed?.isLiked ?? false,
+                            feedPost?.isLiked ?? false,
                             widget.args.index,
                           ),
                           onCommentPressed: () {
@@ -114,16 +132,16 @@ class _FeedDetailsPageState extends State<FeedDetailsPage> {
                                       ),
                                 ),
                               SizedBox(height: 8.h),
-                              if (post?.postId != null)
+                              if (feedPost?.postId != null)
                                 PostLikedUsers(
-                                  postId: post!.postId,
+                                  postId: feedPost!.postId,
                                   feedBloc: widget.args.feedBloc,
                                 ),
                               SizedBox(height: 24.h),
-                              if (post?.postId != null)
+                              if (feedPost?.postId != null)
                                 CommentsList(
                                   feedBloc: widget.args.feedBloc,
-                                  postId: post!.postId,
+                                  postId: feedPost!.postId,
                                   onReplyPressed: (commentId) {
                                     widget.args.feedBloc.add(
                                       ParentCommentIdChanged(
@@ -150,7 +168,8 @@ class _FeedDetailsPageState extends State<FeedDetailsPage> {
                   commentsController: _commentsController,
                   onSend: () => _commentOnPost(
                     feedBloc: widget.args.feedBloc,
-                    post: widget.args.feed?.post,
+                    userId: feedPost?.ownerId,
+                    postId: feedPost?.postId,
                     parentCommentId: state.parentCommentId,
                   ),
                 ),
@@ -167,39 +186,53 @@ class _FeedDetailsPageState extends State<FeedDetailsPage> {
     bool isLiked,
     int index,
   ) {
-    final postId = feed?.post?.postId;
+    final postId = feed?.feedPost?.postId;
     if (postId != null) {
       if (isLiked == true) {
         widget.args.feedBloc.add(
-          PostUnliked(
+          FeedPostUnliked(
             postId: postId,
             index: index,
+            isFromeDetails: true,
           ),
         );
       } else {
-        widget.args.feedBloc.add(
-          PostLiked(
-            postId: postId,
-            index: index,
-          ),
-        );
+        final senderId = getIt<AuthBloc>().state.user?.userId;
+        final userId = feed?.feedPost?.ownerId;
+        final postId = feed?.feedPost?.postId;
+
+        if (userId != null && senderId != null && postId != null) {
+          widget.args.feedBloc.add(
+            FeedPostLiked(
+              postId: postId,
+              index: index,
+              userId: userId,
+              senderId: senderId,
+              isFromeDetails: true,
+            ),
+          );
+        }
       }
     }
   }
 
   void _commentOnPost({
     required FeedBloc feedBloc,
-    required Post? post,
+    required String? userId,
+    required int? postId,
     required int? parentCommentId,
   }) {
-    final userId = getIt<AuthBloc>().state.user?.userId;
-    final postId = post?.postId;
+    final senderId = getIt<AuthBloc>().state.user?.userId;
     final comment = _commentsController.text;
-    if (postId != null && userId != null && comment.isNotEmpty) {
+    if (postId != null &&
+        userId != null &&
+        senderId != null &&
+        comment.isNotEmpty) {
       feedBloc.add(
         Commented(
           comment: CommentReq(
             userId: userId,
+            senderId: senderId,
             postId: postId,
             content: comment,
             parentCommentId: parentCommentId,

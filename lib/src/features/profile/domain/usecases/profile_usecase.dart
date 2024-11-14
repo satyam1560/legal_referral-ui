@@ -4,6 +4,7 @@ import 'package:dartz/dartz.dart';
 import 'package:injectable/injectable.dart';
 import 'package:legal_referral_ui/src/core/config/config.dart';
 import 'package:legal_referral_ui/src/features/auth/domain/domain.dart';
+import 'package:legal_referral_ui/src/features/firm/domain/domain.dart';
 import 'package:legal_referral_ui/src/features/profile/data/data.dart';
 import 'package:legal_referral_ui/src/features/profile/domain/domain.dart';
 
@@ -205,6 +206,22 @@ class ProfileUseCase {
     return _profileRepository.deleteEducation(
       userId: userId,
       educationId: educationId,
+    );
+  }
+
+  Future<Either<Failure, List<FeaturePost>>> fetchFeaturePosts({
+    required String userId,
+  }) async {
+    return _profileRepository.fetchFeaturePosts(
+      userId: userId,
+    );
+  }
+
+  Future<Either<Failure, ResponseMsg?>> unsaveFeaturePost({
+    required int postId,
+  }) async {
+    return _profileRepository.unSaveFeaturePost(
+      postId: postId,
     );
   }
 }

@@ -4,9 +4,20 @@ import 'package:dartz/dartz.dart';
 import 'package:legal_referral_ui/src/core/config/config.dart';
 import 'package:legal_referral_ui/src/features/auth/data/data.dart';
 import 'package:legal_referral_ui/src/features/auth/domain/domain.dart';
-import 'package:legal_referral_ui/src/features/auth/domain/entities/app_user.dart';
 
 abstract class AuthRepository {
+  Future<Either<Failure, EmailAuthRes?>> signInWithEmail({
+    required EmailSignInReq emailSignInReq,
+  });
+
+  Future<Either<Failure, EmailAuthRes?>> signUpWithEmail({
+    required EmailSignUpReq emailSignUpReq,
+  });
+
+  Future<Either<Failure, RefreshTokenRes?>> refreshToken({
+    required RefreshTokenReq refreshTokenReq,
+  });
+
   Future<Either<Failure, AppUser?>> createUser({
     required String email,
     required String firstName,
@@ -47,5 +58,9 @@ abstract class AuthRepository {
 
   Future<Either<Failure, AppUser?>> getUser({
     required String userId,
+  });
+
+  Future<Either<Failure, void>> saveDeviceDetails({
+    required DeviceDetails deviceDetails,
   });
 }

@@ -35,12 +35,30 @@ class PostRepositoryImpl extends PostRepository {
   }
 
   @override
-  Future<Either<Failure, void>> likePost({
+  Future<Either<Failure, Post>> fetchPost({
     required int postId,
   }) async {
     try {
+      final post = await _postDatasource.fetchPost(postId: postId);
+      return Right(post);
+    } on DioException catch (error) {
+      final dioError = DioExceptions.fromDioError(error);
+      return Left(
+        Failure(
+          statusCode: dioError.statusCode,
+          message: dioError.message,
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> likePost({
+    required LikePostReq likePostReq,
+  }) async {
+    try {
       await _postDatasource.likePost(
-        postId: postId,
+        likePostReq: likePostReq,
       );
       return const Right(null);
     } on DioException catch (error) {
@@ -63,6 +81,24 @@ class PostRepositoryImpl extends PostRepository {
         postId: postId,
       );
       return const Right(null);
+    } on DioException catch (error) {
+      final dioError = DioExceptions.fromDioError(error);
+      return Left(
+        Failure(
+          statusCode: dioError.statusCode,
+          message: dioError.message,
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Either<Failure, ResponseMsg>> deletePost({required int postId}) async {
+    try {
+      final response = await _postDatasource.deletePost(
+        postId: postId,
+      );
+      return Right(response);
     } on DioException catch (error) {
       final dioError = DioExceptions.fromDioError(error);
       return Left(

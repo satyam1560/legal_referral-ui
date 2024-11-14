@@ -1,5 +1,3 @@
-import 'package:appinio_social_share/appinio_social_share.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -24,7 +22,9 @@ class FeedTile extends StatelessWidget {
     required this.isLiked,
     required this.likesCount,
     required this.commentsCount,
-    this.imageHeight = 400,
+    this.onTap,
+    this.onOptionsPressed,
+    this.imageHeight = 380,
     super.key,
   });
 
@@ -37,12 +37,13 @@ class FeedTile extends StatelessWidget {
   final bool isLiked;
   final int likesCount;
   final int commentsCount;
+  final VoidCallback? onTap;
+  final VoidCallback? onOptionsPressed;
 
   @override
   Widget build(BuildContext context) {
-    final user = feed?.user;
-    final post = feed?.post;
-    final name = '${user?.firstName} ${user?.lastName}';
+    final feedPost = feed?.feedPost;
+    final name = '${feedPost?.ownerFirstName} ${feedPost?.ownerLastName}';
     final theme = Theme.of(context).textTheme;
     return ColoredBox(
       color: LegalReferralColors.containerWhite500,
@@ -58,7 +59,7 @@ class FeedTile extends StatelessWidget {
               children: [
                 GestureDetector(
                   onTap: () {
-                    final userId = user?.userId;
+                    final userId = feedPost?.ownerId;
                     if (userId != null) {
                       context.pushNamed(
                         ProfilePage.name,
@@ -67,7 +68,7 @@ class FeedTile extends StatelessWidget {
                     }
                   },
                   child: CustomAvatar(
-                    imageUrl: user?.avatarUrl,
+                    imageUrl: feedPost?.ownerAvatarUrl,
                     radius: 28.r,
                   ),
                 ),
@@ -98,7 +99,9 @@ class FeedTile extends StatelessWidget {
                                 color: LegalReferralColors.textGrey117,
                               ),
                               children: [
-                                TextSpan(text: '${user?.practiceArea ?? ''} '),
+                                TextSpan(
+                                  text: '${feedPost?.ownerPracticeArea ?? ''} ',
+                                ),
                                 const TextSpan(text: ' • 1st'),
                               ],
                             ),
@@ -110,7 +113,7 @@ class FeedTile extends StatelessWidget {
                         height: 2.8.h,
                       ),
                       Text(
-                        DateTimeUtil.timeAgo(feed?.createdAt),
+                        DateTimeUtil.timeAgo(feed?.feedPost?.createdAt),
                         style: theme.bodyMedium?.copyWith(
                           color: LegalReferralColors.textGrey117,
                           fontSize: 12.sp,
@@ -124,35 +127,44 @@ class FeedTile extends StatelessWidget {
                   height: 24.w,
                   width: 24.h,
                   imagePath: IconStringConstants.threeDots,
-                  onPressed: () => _showOptionSheet(context),
+                  onPressed: () => onOptionsPressed?.call(),
                 ),
               ],
             ),
           ),
-          if (post?.content != null && post!.content!.isNotEmpty)
-            ExpandableText(
-              padding: EdgeInsets.symmetric(
-                horizontal: 16.w,
-                vertical: 8.h,
-              ),
-              text: post.content ?? '',
+          GestureDetector(
+            onTap: onTap,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (feedPost?.content != null && feedPost!.content!.isNotEmpty)
+                  ExpandableText(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 16.w,
+                      vertical: 8.h,
+                    ),
+                    text: feedPost.content ?? '',
+                  ),
+                if (feedPost?.postType == PostType.link &&
+                    feedPost?.content != null)
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                      vertical: 20.h,
+                    ),
+                    child: LinkPreviewWidget(
+                      text: feedPost!.content!,
+                    ),
+                  )
+                else
+                  MediaPost(
+                    imageHeight: imageHeight,
+                    postType: feedPost?.postType ?? PostType.image,
+                    mediaUrls: feedPost?.media ?? [],
+                    fileName: feedPost?.content,
+                  ),
+              ],
             ),
-          if (post?.type == PostType.link && post?.content != null)
-            Padding(
-              padding: EdgeInsets.symmetric(
-                vertical: 20.h,
-              ),
-              child: LinkPreviewWidget(
-                text: post!.content!,
-              ),
-            )
-          else
-            MediaPost(
-              imageHeight: imageHeight,
-              postType: post?.type ?? PostType.image,
-              mediaUrls: post?.filesUrls ?? [],
-              fileName: post?.content,
-            ),
+          ),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 16.w),
             child: Row(
@@ -223,13 +235,13 @@ class FeedTile extends StatelessWidget {
                 icon: IconStringConstants.discuss,
                 text: 'Discuss',
                 textColor: LegalReferralColors.textGrey117,
-                onTap: () {},
+                onTap: onDiscussPressed,
               ),
               VerticalIconButton(
                 icon: IconStringConstants.share,
                 text: 'Share',
                 textColor: LegalReferralColors.textGrey117,
-                onTap: () {},
+                onTap: onSharePressed,
               ),
             ],
           ),
@@ -240,153 +252,4 @@ class FeedTile extends StatelessWidget {
       ),
     );
   }
-}
-
-void _showOptionSheet(BuildContext context) {
-  CustomBottomSheet.show(
-    isDismissible: true,
-    borderRadius: true,
-    maxWidth: double.infinity,
-    context: context,
-    child: Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        ListTile(
-          onTap: () {},
-          leading: SvgPicture.asset(IconStringConstants.download),
-          title: Text(
-            'Save',
-            style: Theme.of(context)
-                .textTheme
-                .bodyLarge
-                ?.copyWith(color: LegalReferralColors.textGrey500),
-          ),
-        ),
-        const Divider(),
-        ListTile(
-          onTap: () {},
-          leading: SvgPicture.asset(IconStringConstants.message),
-          title: Text(
-            'Message',
-            style: Theme.of(context)
-                .textTheme
-                .bodyLarge
-                ?.copyWith(color: LegalReferralColors.textGrey500),
-          ),
-        ),
-        const Divider(),
-        ListTile(
-          onTap: () {},
-          leading: SvgPicture.asset(IconStringConstants.addFollow),
-          title: Text(
-            'Follow',
-            style: Theme.of(context)
-                .textTheme
-                .bodyLarge
-                ?.copyWith(color: LegalReferralColors.textGrey500),
-          ),
-        ),
-        const Divider(),
-        ListTile(
-          onTap: () async {
-            final appinioSocialShare = AppinioSocialShare();
-
-            final result = await FilePicker.platform.pickFiles();
-
-            if (result != null && result.paths.isNotEmpty) {
-              await appinioSocialShare.android
-                  .shareFilesToSMS(result.paths.nonNulls.toList());
-            }
-          },
-          leading: SvgPicture.asset(
-            IconStringConstants.share,
-            colorFilter: const ColorFilter.mode(
-              LegalReferralColors.borderBlue100,
-              BlendMode.srcIn,
-            ),
-          ),
-          title: Text(
-            'Share via',
-            style: Theme.of(context)
-                .textTheme
-                .bodyLarge
-                ?.copyWith(color: LegalReferralColors.textGrey500),
-          ),
-        ),
-        const Divider(),
-        ListTile(
-          onTap: () {},
-          leading: SvgPicture.asset(IconStringConstants.restrict),
-          title: Text(
-            '''I don't want to see this''',
-            style: Theme.of(context)
-                .textTheme
-                .bodyLarge
-                ?.copyWith(color: LegalReferralColors.textGrey500),
-          ),
-        ),
-        const Divider(),
-        ListTile(
-          onTap: () {},
-          leading: SvgPicture.asset(IconStringConstants.flag),
-          title: Text(
-            'Report post',
-            style: Theme.of(context)
-                .textTheme
-                .bodyLarge
-                ?.copyWith(color: LegalReferralColors.textGrey500),
-          ),
-        ),
-        const Divider(),
-        ListTile(
-          onTap: () {},
-          leading: SvgPicture.asset(
-            IconStringConstants.editIcon,
-            colorFilter: const ColorFilter.mode(
-              LegalReferralColors.borderBlue100,
-              BlendMode.srcIn,
-            ),
-          ),
-          title: Text(
-            'Edit',
-            style: Theme.of(context)
-                .textTheme
-                .bodyLarge
-                ?.copyWith(color: LegalReferralColors.textGrey500),
-          ),
-        ),
-        const Divider(),
-        ListTile(
-          onTap: () {},
-          leading: SvgPicture.asset(IconStringConstants.favorite),
-          title: Text(
-            'Make feature post',
-            style: Theme.of(context)
-                .textTheme
-                .bodyLarge
-                ?.copyWith(color: LegalReferralColors.textGrey500),
-          ),
-        ),
-        const Divider(),
-        ListTile(
-          onTap: () {},
-          leading: SvgPicture.asset(
-            IconStringConstants.deleteIcon,
-            colorFilter: const ColorFilter.mode(
-              LegalReferralColors.borderBlue100,
-              BlendMode.srcIn,
-            ),
-          ),
-          title: Text(
-            'Delete',
-            style: Theme.of(context)
-                .textTheme
-                .bodyLarge
-                ?.copyWith(color: LegalReferralColors.textGrey500),
-          ),
-        ),
-        const Divider(),
-      ],
-    ),
-  );
 }
