@@ -1,5 +1,5 @@
 ## Legal Referral UI
-
+![image](https://github.com/user-attachments/assets/096f461d-e5f9-4eed-830c-f0cb7e5f24f2)
 ## APP SIGNING
 keytool -genkey -v -keystore ~/legal-referral-dev.jks -keyalg RSA -keysize 2048 -validity 10000 -alias androiddevkey
 /gradlew signingReport
