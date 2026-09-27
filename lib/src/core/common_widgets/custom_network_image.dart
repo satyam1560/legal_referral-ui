@@ -30,7 +30,7 @@ class CustomNetworkImage extends StatelessWidget {
               IconStringConstants.imagePlaceholder,
             ),
         image: CachedNetworkImageProvider(
-          imageUrl ?? '',
+          '${APIConstants.cloudFrontURL}/$imageUrl',
         ),
         fit: fit,
         height: height ?? 140.h,

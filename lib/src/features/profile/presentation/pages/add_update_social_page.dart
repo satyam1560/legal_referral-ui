@@ -97,25 +97,25 @@ class _AddUpdateSocialPageState extends State<AddUpdateSocialPage> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 SizedBox(height: 12.h),
-                                CustomDropDown(
-                                  items: SocialMediaConstants.socialMediaList,
-                                  selectedValue: _platformController.text == ''
-                                      ? null
-                                      : _platformController.text,
-                                  onChange: (value) {
-                                    if (value != null) {
-                                      _platformController.text = value;
-                                    }
-                                  },
-                                  hintText: 'Select social media',
-                                  labelText: 'Social Media',
-                                  validator: (value) {
-                                    if (value == null) {
-                                      return 'Please select a social media';
-                                    }
-                                    return null;
-                                  },
-                                ),
+                                // CustomDropDown(
+                                //   items: SocialMediaConstants.socialMediaList,
+                                //   selectedValue: _platformController.text == ''
+                                //       ? null
+                                //       : _platformController.text,
+                                //   onChange: (value) {
+                                //     if (value != null) {
+                                //       _platformController.text = value;
+                                //     }
+                                //   },
+                                //   hintText: 'Select social media',
+                                //   labelText: 'Social Media',
+                                //   validator: (value) {
+                                //     if (value == null) {
+                                //       return 'Please select a social media';
+                                //     }
+                                //     return null;
+                                //   },
+                                // ),
                                 SizedBox(height: 16.h),
                                 CustomTextField(
                                   controller: _linkController,

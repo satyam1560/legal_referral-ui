@@ -7,11 +7,7 @@ part of 'send_mobile_otp_req.dart';
 // **************************************************************************
 
 SendMobileOtpReq _$SendMobileOtpReqFromJson(Map<String, dynamic> json) =>
-    SendMobileOtpReq(
-      mobile: json['mobile'] as String,
-    );
+    SendMobileOtpReq(mobile: json['mobile'] as String);
 
 Map<String, dynamic> _$SendMobileOtpReqToJson(SendMobileOtpReq instance) =>
-    <String, dynamic>{
-      'mobile': instance.mobile,
-    };
+    <String, dynamic>{'mobile': instance.mobile};

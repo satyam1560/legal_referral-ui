@@ -14,19 +14,13 @@ import 'package:legal_referral_ui/src/features/profile/presentation/presentation
 import 'package:toastification/toastification.dart';
 
 class AddUpdateExperiencePageArgs {
-  AddUpdateExperiencePageArgs({
-    required this.profileBloc,
-    this.userExp,
-  });
+  AddUpdateExperiencePageArgs({required this.profileBloc, this.userExp});
   final ProfileBloc profileBloc;
   final UserExperience? userExp;
 }
 
 class AddUpdateExperiencePage extends StatefulWidget {
-  const AddUpdateExperiencePage({
-    required this.args,
-    super.key,
-  });
+  const AddUpdateExperiencePage({required this.args, super.key});
 
   final AddUpdateExperiencePageArgs args;
 
@@ -64,15 +58,11 @@ class _AddUpdateExperiencePageState extends State<AddUpdateExperiencePage> {
       _practiceLocation = experience.practiceLocation;
 
       _startDateController.text = experience.startDate != null
-          ? DateTimeUtil.getFormattedDate(
-              experience.startDate!,
-            )
+          ? DateTimeUtil.getFormattedDate(experience.startDate!)
           : '';
       _startDate = experience.startDate;
       _endDateController.text = experience.endDate != null
-          ? DateTimeUtil.getFormattedDate(
-              experience.endDate!,
-            )
+          ? DateTimeUtil.getFormattedDate(experience.endDate!)
           : '';
       _endDate = experience.endDate;
       _current = experience.current ?? false;
@@ -132,8 +122,8 @@ class _AddUpdateExperiencePageState extends State<AddUpdateExperiencePage> {
                               labelText: 'Title',
                               validator: (value) =>
                                   value == null || value.isEmpty
-                                      ? 'Title is required'
-                                      : null,
+                                  ? 'Title is required'
+                                  : null,
                             ),
                             SizedBox(height: 16.h),
                             CustomDropDown(
@@ -156,8 +146,9 @@ class _AddUpdateExperiencePageState extends State<AddUpdateExperiencePage> {
                             SizedBox(height: 16.h),
                             GestureDetector(
                               onTap: () async {
-                                final firm = await context
-                                    .pushNamed(SearchFirmPage.name) as Firm?;
+                                final firm =
+                                    await context.pushNamed(SearchFirmPage.name)
+                                        as Firm?;
 
                                 if (firm != null) {
                                   _firmNameController.text = firm.name;
@@ -170,8 +161,8 @@ class _AddUpdateExperiencePageState extends State<AddUpdateExperiencePage> {
                                 labelText: 'Firm',
                                 validator: (value) =>
                                     value == null || value.isEmpty
-                                        ? 'Firm name is required'
-                                        : null,
+                                    ? 'Firm name is required'
+                                    : null,
                                 enabled: false,
                               ),
                             ),
@@ -207,9 +198,10 @@ class _AddUpdateExperiencePageState extends State<AddUpdateExperiencePage> {
                                           primary:
                                               LegalReferralColors.buttonPrimary,
                                         ),
-                                        dialogBackgroundColor:
-                                            LegalReferralColors
-                                                .primaryBackground,
+                                        dialogTheme: const DialogThemeData(
+                                          backgroundColor: LegalReferralColors
+                                              .primaryBackground,
+                                        ),
                                       ),
                                       child: child!,
                                     );
@@ -218,9 +210,7 @@ class _AddUpdateExperiencePageState extends State<AddUpdateExperiencePage> {
 
                                 if (pickedDate != null) {
                                   _startDateController.text =
-                                      DateTimeUtil.getFormattedDate(
-                                    pickedDate,
-                                  );
+                                      DateTimeUtil.getFormattedDate(pickedDate);
 
                                   _startDate = pickedDate;
                                 }
@@ -232,8 +222,8 @@ class _AddUpdateExperiencePageState extends State<AddUpdateExperiencePage> {
                                 enabled: false,
                                 validator: (value) =>
                                     value == null || value.isEmpty
-                                        ? 'Start date is required'
-                                        : null,
+                                    ? 'Start date is required'
+                                    : null,
                               ),
                             ),
                             SizedBox(height: 16.h),
@@ -284,9 +274,10 @@ class _AddUpdateExperiencePageState extends State<AddUpdateExperiencePage> {
                                             primary: LegalReferralColors
                                                 .buttonPrimary,
                                           ),
-                                          dialogBackgroundColor:
-                                              LegalReferralColors
-                                                  .primaryBackground,
+                                          dialogTheme: const DialogThemeData(
+                                            backgroundColor: LegalReferralColors
+                                                .primaryBackground,
+                                          ),
                                         ),
                                         child: child!,
                                       );
@@ -296,8 +287,8 @@ class _AddUpdateExperiencePageState extends State<AddUpdateExperiencePage> {
                                   if (pickedDate != null) {
                                     _endDateController.text =
                                         DateTimeUtil.getFormattedDate(
-                                      pickedDate,
-                                    );
+                                          pickedDate,
+                                        );
 
                                     _endDate = pickedDate;
                                   }
@@ -345,8 +336,9 @@ class _AddUpdateExperiencePageState extends State<AddUpdateExperiencePage> {
                                     for (final skill in _skills)
                                       Chip(
                                         shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(4.r),
+                                          borderRadius: BorderRadius.circular(
+                                            4.r,
+                                          ),
                                           side: const BorderSide(
                                             color: LegalReferralColors
                                                 .buttonPrimary,
@@ -374,8 +366,8 @@ class _AddUpdateExperiencePageState extends State<AddUpdateExperiencePage> {
                               labelText: 'Description',
                               validator: (value) =>
                                   value == null || value.isEmpty
-                                      ? 'Description is required'
-                                      : null,
+                                  ? 'Description is required'
+                                  : null,
                             ),
                             SizedBox(height: 24.h),
                             if (userExp?.experience?.experienceId != null)
@@ -395,17 +387,14 @@ class _AddUpdateExperiencePageState extends State<AddUpdateExperiencePage> {
                                   },
                                   child: const Text(
                                     'Delete Experience',
-                                    style: TextStyle(
-                                      color: Colors.red,
-                                    ),
+                                    style: TextStyle(color: Colors.red),
                                   ),
                                 ),
                               ),
                             SizedBox(height: 24.h),
                             CustomElevatedButton(
-                              onTap: () => _addExperience(
-                                profileBloc: profileBloc,
-                              ),
+                              onTap: () =>
+                                  _addExperience(profileBloc: profileBloc),
                               text: 'Save and Proceed',
                             ),
                             SizedBox(height: 12.h),
@@ -422,6 +411,23 @@ class _AddUpdateExperiencePageState extends State<AddUpdateExperiencePage> {
 
   void _addExperience({required ProfileBloc profileBloc}) {
     if (_formKey.currentState!.validate()) {
+      print('========== ADD EXPERIENCE ==========');
+
+      print('_current: $_current');
+      print('_practiceArea: $_practiceArea');
+      print('_practiceLocation: $_practiceLocation');
+      print('firmId: $firmId');
+      print('_startDate: $_startDate');
+      print('_endDate: $_endDate');
+
+      print('_title: ${_titleController.text}');
+      print('_firmName: ${_firmNameController.text}');
+      print('_startDateText: ${_startDateController.text}');
+      print('_endDateText: ${_endDateController.text}');
+      print('_skills: $_skills');
+
+      print('====================================');
+
       if (!_current && _endDate == null) {
         ToastUtil.showToast(
           context,
@@ -475,11 +481,7 @@ class _AddUpdateExperiencePageState extends State<AddUpdateExperiencePage> {
           ),
         );
       } else {
-        profileBloc.add(
-          ExperienceAdded(
-            addExperienceReq: addExperienceReq,
-          ),
-        );
+        profileBloc.add(ExperienceAdded(addExperienceReq: addExperienceReq));
       }
     }
   }

@@ -282,6 +282,13 @@ abstract class APIClient {
     @Path('educationId') int educationId,
   );
 
+  // accounts
+
+  @GET('/accounts/{userId}')
+  Future<AccountInfo> fetchAccountInfo(
+    @Path('userId') String userId,
+  );
+
   // network
 
   @POST('/connections/send')
@@ -492,7 +499,7 @@ abstract class APIClient {
   );
 
   // feed
-  @GET('/v2/feeds/{userId}')
+  @GET('/v3/feeds/{userId}')
   Future<List<Feed?>> fetchFeeds(
     @Path('userId') String userId,
     @Query('limit') int limit,
@@ -523,6 +530,11 @@ abstract class APIClient {
 
   @GET('/posts/{postId}/comments')
   Future<List<Comment?>> fetchPostComments(
+    @Path('postId') int postId,
+  );
+
+  @GET('/posts/{postId}/is-featured')
+  Future<bool> isPostFeatured(
     @Path('postId') int postId,
   );
 
@@ -649,14 +661,17 @@ abstract class APIClient {
     @Path('post_id') int postId,
   );
 
+  // feature posts
+
   @POST('/feature-posts')
-  Future<ResponseMsg> saveFeaturePost(
-    @Body() SaveFeaturePostReq saveFeaturePostReq,
+  Future<ResponseMsg> featurePost(
+    @Body() FeaturePostReq saveFeaturePostReq,
   );
 
   @DELETE('/feature-posts/{postId}')
-  Future<ResponseMsg> unSaveFeaturePost(
+  Future<ResponseMsg> unFeaturePost(
     @Path('postId') int postId,
+    @Body() UnFeaturePostReq unFeaturePostReq,
   );
 
   @GET('/feature-posts/{userId}')
@@ -684,5 +699,42 @@ abstract class APIClient {
     @Path('userId') String userId,
     @Query('limit') int limit,
     @Query('offset') int offset,
+  );
+
+  // report post
+  @POST('/report-post')
+  Future<ResponseMsg> reportPost(
+    @Body() ReportPostReq reportPostReq,
+  );
+
+  @GET('/posts/{postId}/reported-status/{userId}')
+  Future<bool> isPostReported(
+    @Path('postId') int postId,
+    @Path('userId') String userId,
+  );
+
+  @DELETE('/feeds/{feedId}/ignore')
+  Future<void> ignoreFeed(
+    @Path('feedId') int feedId,
+  );
+
+  // activity
+  @GET('/activity/posts/{userId}')
+  Future<List<Post>> fetchActivityPosts(
+    @Path('userId') String userId,
+    @Query('limit') int limit,
+    @Query('offset') int offset,
+  );
+
+  @GET('/activity/comments/{userId}')
+  Future<List<Comment>> fetchActivityComments(
+    @Path('userId') String userId,
+    @Query('limit') int limit,
+    @Query('offset') int offset,
+  );
+
+  @GET('/users/{userId}/followers-count')
+  Future<int> fetchUserFollowersCount(
+    @Path('userId') String userId,
   );
 }

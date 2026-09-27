@@ -1,11 +1,10 @@
-import 'dart:async';
-
 import 'package:dio/dio.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:legal_referral_ui/firebase_options.dart';
 import 'package:legal_referral_ui/src/core/config/config.dart';
@@ -24,7 +23,7 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 }
 
 Future<void> main() async {
-  // await dotenv.load(fileName: 'assets/.env');
+  await dotenv.load(fileName: 'assets/.env');
   WidgetsFlutterBinding.ensureInitialized();
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
@@ -35,6 +34,7 @@ Future<void> main() async {
   );
 
   configureDependencies();
+
   getIt<Dio>().interceptors.addAll([
     AuthInterceptor(
       dio: getIt<Dio>(),

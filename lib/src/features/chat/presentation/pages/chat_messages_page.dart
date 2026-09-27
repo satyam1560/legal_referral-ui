@@ -1,7 +1,7 @@
 import 'package:bubble/bubble.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
+import 'package:flutter_chat_core/flutter_chat_core.dart';
 import 'package:flutter_chat_ui/flutter_chat_ui.dart' as chat_ui;
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -33,25 +33,49 @@ class _ChatMessagesPageState extends State<ChatMessagesPage> {
   final _authBloc = getIt<AuthBloc>();
   final _chatBloc = getIt<ChatBloc>();
   final _focusNode = FocusNode();
+  final _textEditingController = TextEditingController();
+  late final InMemoryChatController _chatController;
 
   @override
   void initState() {
+    super.initState();
+
+    _chatController = InMemoryChatController();
+
     final currentUserId = _authBloc.state.user?.userId;
-    if (currentUserId == null) {
-      return;
-    }
+    if (currentUserId == null) return;
 
     _chatBloc.add(
       ChatRoomCreated(
-        senderId: _authBloc.state.user?.userId ?? '',
+        senderId: currentUserId,
         recipientId: widget.recipientId,
       ),
     );
-
-    super.initState();
   }
 
-  final _textEditingController = TextEditingController();
+  /// Syncs the bloc's message list into the ChatController whenever
+  /// state.messages changes.
+  Future<void> _syncMessages(List<ChatMessage> messages) async {
+    final coreMessages = messages.map(_toCoreMessage).toList();
+    await _chatController.setMessages(coreMessages);
+  }
+
+  /// Converts your domain ChatMessage to flutter_chat_core TextMessage.
+  TextMessage _toCoreMessage(ChatMessage m) {
+    return TextMessage(
+      id: m.messageId.toString(),
+      authorId: m.senderId,
+      // createdAt: m.createdAt != null
+      //     ? DateTime.parse(m.createdAt!).toUtc()
+      //     : DateTime.now().toUtc(),
+      text: m.message,
+      // Store the replied message text in metadata so
+      // _textMessageBuilder can access it.
+      metadata: m.repliedMessage != null
+          ? {'repliedText': m.repliedMessage!.message}
+          : null,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -59,14 +83,6 @@ class _ChatMessagesPageState extends State<ChatMessagesPage> {
     if (currentUser == null) {
       return const Scaffold(body: CustomLoadingIndicator());
     }
-
-    final user = types.User(
-      id: currentUser.userId ?? '',
-      imageUrl: currentUser.avatarUrl,
-      firstName: currentUser.firstName,
-      lastName: currentUser.lastName,
-      createdAt: currentUser.joinDate?.millisecondsSinceEpoch,
-    );
 
     return BlocConsumer<ChatBloc, ChatState>(
       bloc: _chatBloc,
@@ -78,6 +94,11 @@ class _ChatMessagesPageState extends State<ChatMessagesPage> {
             description: state.failure?.message ?? 'something went wrong',
             type: ToastificationType.error,
           );
+        }
+
+        // Sync messages into the controller whenever state updates.
+        if (state.status == ChatStatus.success) {
+          _syncMessages(state.chatMessages.whereType<ChatMessage>().toList());
         }
       },
       builder: (context, state) {
@@ -91,122 +112,60 @@ class _ChatMessagesPageState extends State<ChatMessagesPage> {
             surfaceTintColor: Colors.white,
           ),
           body: state.status == ChatStatus.success
-              ? chat_ui.Chat(
-                  messages: state.messages,
-                  bubbleBuilder: _bubbleBuilder,
-                  onAttachmentPressed: () {},
-                  onMessageTap: (context, message) {},
-                  onPreviewDataFetched: (_, __) {},
-                  onSendPressed: (_) {},
-                  showUserAvatars: true,
-                  showUserNames: true,
-                  timeFormat: DateFormat('HH:mm'),
-                  dateFormat: DateFormat('yyyy-MM-dd'),
-                  user: user,
-                  textMessageBuilder: _textMessageBuilder,
-                  theme: chat_ui.DefaultChatTheme(
-                    sentMessageBodyTextStyle: TextStyle(
-                      color: Colors.grey.shade700,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                    ),
-                    seenIcon: Text(
-                      'read',
-                      style: TextStyle(
-                        fontSize: 10,
-                        color: Colors.grey.shade500,
-                      ),
-                    ),
-                  ),
-                  customBottomWidget: SizedBox(
-                    height: kBottomNavigationBarHeight +
-                        26.h +
-                        (state.parentMessage != null
-                            ? (state.parentMessage!.message.length > 8
-                                ? 44.h
-                                : 24.h)
-                            : 0),
-                    child: BottomAppBar(
-                      color: Colors.white,
-                      surfaceTintColor: Colors.white,
-                      shadowColor: Colors.grey,
-                      elevation: 4,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          if (state.parentMessage != null)
-                            Padding(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: 6.w,
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Repling to: '
-                                    '${state.parentMessage?.message}',
-                                    style: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 14.sp,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  SizedBox(height: 2.h),
-                                ],
+              ? Column(
+                  children: [
+                    Expanded(
+                      child: chat_ui.Chat(
+                        chatController: _chatController,
+                        currentUserId: currentUser.userId ?? '',
+                        resolveUser: (id) async {
+                          // Return user info for avatars/names.
+                          // Adapt this to your actual user lookup if needed.
+                          return User(id: id);
+                        },
+                        onMessageSend: (text) {
+                          if (text.trim().isEmpty) return;
+                          _chatBloc.add(
+                            ChatMessageSent(
+                              chatRoom: state.currentChatRoom,
+                              message: ChatMessage(
+                                senderId: currentUser.userId ?? '',
+                                recipientId: state.currentChatRoom.userId,
+                                parentMessageId:
+                                    state.parentMessage?.messageId ?? 0,
+                                message: text,
+                                roomId: state.currentChatRoom.roomId,
+                                repliedMessage: state.parentMessage,
                               ),
                             ),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: CustomTextField(
-                                  focusNode: _focusNode,
-                                  hintText: 'Your message here',
-                                  controller: _textEditingController,
-                                  onChanged: (value) {},
-                                ),
-                              ),
-                              IconButton(
-                                icon: SvgPicture.asset(
-                                  IconStringConstants.send,
-                                  colorFilter: const ColorFilter.mode(
-                                    Colors.blue,
-                                    BlendMode.srcIn,
-                                  ),
-                                  height: 24.h,
-                                  width: 24.w,
-                                ),
-                                onPressed: () {
-                                  _chatBloc.add(
-                                    ChatMessageSent(
-                                      chatRoom: state.currentChatRoom,
-                                      message: ChatMessage(
-                                        senderId: currentUser.userId ?? '',
-                                        recipientId:
-                                            state.currentChatRoom.userId,
-                                        parentMessageId:
-                                            state.parentMessage?.messageId ?? 0,
-                                        message: _textEditingController.text,
-                                        roomId: state.currentChatRoom.roomId,
-                                        repliedMessage: state.parentMessage,
-                                      ),
-                                    ),
-                                  );
-                                  _textEditingController.clear();
-                                },
-                              ),
-                            ],
-                          ),
-                        ],
+                          );
+                        },
+                        onMessageTap: (context, message,
+                            {required details, required index}) {},
+                        timeFormat: DateFormat('HH:mm'),
+                        // builders: chat_ui.Builders(
+                        //   textMessageBuilder: (context,
+                        //       {required message, required index}) {
+                        //     return _textMessageBuilder(
+                        //       message as TextMessage,
+                        //     );
+                        //   },
+                        //   bubbleBuilder: (context,
+                        //       {required message,
+                        //       required index,
+                        //       required child}) {
+                        //     return _bubbleBuilder(
+                        //       child,
+                        //       message: message,
+                        //       currentUserId: currentUser.userId ?? '',
+                        //     );
+                        //   },
+                        // ),
                       ),
                     ),
-                  ),
-                  onEndReached: () async {
-                    _chatBloc.add(
-                      MessagesFetched(),
-                    );
-                  },
+                    // Custom bottom input bar — replaces customBottomWidget
+                    _buildInputBar(state, currentUser),
+                  ],
                 )
               : const CustomLoadingIndicator(),
         );
@@ -214,33 +173,106 @@ class _ChatMessagesPageState extends State<ChatMessagesPage> {
     );
   }
 
-  void _replyToMessage({required ChatMessage parentMessage}) {
-    _chatBloc.add(
-      ParentMesssgeUpdated(message: parentMessage),
+  Widget _buildInputBar(ChatState state, dynamic currentUser) {
+    return SizedBox(
+      height: kBottomNavigationBarHeight +
+          26.h +
+          (state.parentMessage != null
+              ? (state.parentMessage!.message.length > 8 ? 44.h : 24.h)
+              : 0),
+      child: BottomAppBar(
+        color: Colors.white,
+        surfaceTintColor: Colors.white,
+        shadowColor: Colors.grey,
+        elevation: 4,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (state.parentMessage != null)
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 6.w),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Repling to: ${state.parentMessage?.message}',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.w600,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    SizedBox(height: 2.h),
+                  ],
+                ),
+              ),
+            Row(
+              children: [
+                Expanded(
+                  child: CustomTextField(
+                    focusNode: _focusNode,
+                    hintText: 'Your message here',
+                    controller: _textEditingController,
+                    onChanged: (value) {},
+                  ),
+                ),
+                IconButton(
+                  icon: SvgPicture.asset(
+                    IconStringConstants.send,
+                    colorFilter: const ColorFilter.mode(
+                      Colors.blue,
+                      BlendMode.srcIn,
+                    ),
+                    height: 24.h,
+                    width: 24.w,
+                  ),
+                  onPressed: () {
+                    final text = _textEditingController.text;
+                    if (text.trim().isEmpty) return;
+                    _chatBloc.add(
+                      ChatMessageSent(
+                        chatRoom: state.currentChatRoom,
+                        message: ChatMessage(
+                          senderId: currentUser.userId ?? '',
+                          recipientId: state.currentChatRoom.userId,
+                          parentMessageId:
+                              state.parentMessage?.messageId ?? 0,
+                          message: text,
+                          roomId: state.currentChatRoom.roomId,
+                          repliedMessage: state.parentMessage,
+                        ),
+                      ),
+                    );
+                    _textEditingController.clear();
+                  },
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
     );
+  }
+
+  void _replyToMessage({required ChatMessage parentMessage}) {
+    _chatBloc.add(ParentMesssgeUpdated(message: parentMessage));
     FocusScope.of(context).requestFocus(_focusNode);
   }
 
-  Widget _textMessageBuilder(
-    types.TextMessage p0, {
-    required int messageWidth,
-    required bool showName,
-  }) {
-    final repliedMessage = p0.repliedMessage?.type == types.MessageType.text
-        ? p0.repliedMessage as types.TextMessage
-        : null;
+  Widget _textMessageBuilder(TextMessage message) {
+    final repliedText = message.metadata?['repliedText'] as String?;
 
     return Padding(
-      padding: EdgeInsets.symmetric(
-        horizontal: 8.w,
-      ),
+      padding: EdgeInsets.symmetric(horizontal: 8.w),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (repliedMessage != null)
+          if (repliedText != null)
             Text(
-              'Replied to: ${repliedMessage.text}',
+              'Replied to: $repliedText',
               style: TextStyle(
                 color: Colors.black,
                 fontSize: 14.sp,
@@ -248,11 +280,9 @@ class _ChatMessagesPageState extends State<ChatMessagesPage> {
               ),
             ),
           Padding(
-            padding: EdgeInsets.symmetric(
-              vertical: 4.h,
-            ),
+            padding: EdgeInsets.symmetric(vertical: 4.h),
             child: Text(
-              p0.text,
+              message.text,
               style: TextStyle(
                 color: Colors.grey.shade700,
                 fontSize: 16.sp,
@@ -262,23 +292,20 @@ class _ChatMessagesPageState extends State<ChatMessagesPage> {
           ),
           const Divider(),
           Padding(
-            padding: EdgeInsets.symmetric(
-              vertical: 4.h,
-            ),
+            padding: EdgeInsets.symmetric(vertical: 4.h),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 GestureDetector(
                   onTap: () {
                     final parentMessage = ChatMessage(
-                      messageId: int.tryParse(p0.id) ?? 0,
-                      senderId: p0.author.id,
-                      recipientId: p0.author.id,
+                      messageId: int.tryParse(message.id) ?? 0,
+                      senderId: message.authorId,
+                      recipientId: message.authorId,
                       parentMessageId: 0,
-                      message: p0.text,
+                      message: message.text,
                       roomId: _chatBloc.state.currentChatRoom.roomId,
                     );
-
                     _replyToMessage(parentMessage: parentMessage);
                   },
                   child: Row(
@@ -288,14 +315,13 @@ class _ChatMessagesPageState extends State<ChatMessagesPage> {
                         color: Colors.grey.shade700,
                         onPressed: () {
                           final parentMessage = ChatMessage(
-                            messageId: int.tryParse(p0.id) ?? 0,
-                            senderId: p0.author.id,
-                            recipientId: p0.author.id,
+                            messageId: int.tryParse(message.id) ?? 0,
+                            senderId: message.authorId,
+                            recipientId: message.authorId,
                             parentMessageId: 0,
-                            message: p0.text,
+                            message: message.text,
                             roomId: _chatBloc.state.currentChatRoom.roomId,
                           );
-
                           _replyToMessage(parentMessage: parentMessage);
                         },
                         height: 16.8.h,
@@ -313,11 +339,7 @@ class _ChatMessagesPageState extends State<ChatMessagesPage> {
                   ),
                 ),
                 Text(
-                  DateFormat.jm().format(
-                    DateTime.fromMillisecondsSinceEpoch(
-                      p0.createdAt ?? 0,
-                    ),
-                  ),
+                  DateFormat.jm().format(message.createdAt?.toLocal()?? DateTime.now()),
                   style: TextStyle(
                     color: Colors.grey.shade700,
                     fontSize: 14.sp,
@@ -333,30 +355,22 @@ class _ChatMessagesPageState extends State<ChatMessagesPage> {
 
   Widget _bubbleBuilder(
     Widget child, {
-    required message,
-    required nextMessageInGroup,
+    required Message message,
+    required String currentUserId,
   }) {
-    final currentUserId = _authBloc.state.user?.userId;
+    final isCurrentUser = message.authorId == currentUserId;
     return Bubble(
-      color: currentUserId != message.author.id ||
-              message.type == types.MessageType.image
-          ? Colors.white
-          : const Color(0XFFF9FFE7),
-      margin: nextMessageInGroup
-          ? const BubbleEdges.symmetric(horizontal: 6, vertical: 2)
-          : null,
-      nip: nextMessageInGroup
-          ? BubbleNip.no
-          : currentUserId != message.author.id
-              ? BubbleNip.leftBottom
-              : BubbleNip.rightBottom,
+      color: !isCurrentUser ? Colors.white : const Color(0XFFF9FFE7),
+      nip: isCurrentUser ? BubbleNip.rightBottom : BubbleNip.leftBottom,
       child: child,
     );
   }
 
   @override
   void dispose() {
+    _chatController.dispose();
     _textEditingController.dispose();
+    _focusNode.dispose();
     super.dispose();
   }
 }

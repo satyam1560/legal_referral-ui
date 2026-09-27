@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
 import 'package:legal_referral_ui/src/core/config/config.dart';
 import 'package:legal_referral_ui/src/core/network/network.dart';
+import 'package:legal_referral_ui/src/features/auth/domain/domain.dart';
 import 'package:legal_referral_ui/src/features/post/data/data.dart';
 import 'package:legal_referral_ui/src/features/post/domain/domain.dart';
 
@@ -93,10 +94,172 @@ class PostRepositoryImpl extends PostRepository {
   }
 
   @override
+  Future<Either<Failure, List<AppUser?>>> fetchPostLikedUsers({
+    required int postId,
+  }) async {
+    try {
+      final response = await _postDatasource.fetchPostLikedUsers(
+        postId: postId,
+      );
+      return Right(response);
+    } on DioException catch (error) {
+      final dioError = DioExceptions.fromDioError(error);
+      return Left(
+        Failure(
+          statusCode: dioError.statusCode,
+          message: dioError.message,
+        ),
+      );
+    }
+  }
+
+  @override
   Future<Either<Failure, ResponseMsg>> deletePost({required int postId}) async {
     try {
       final response = await _postDatasource.deletePost(
         postId: postId,
+      );
+      return Right(response);
+    } on DioException catch (error) {
+      final dioError = DioExceptions.fromDioError(error);
+      return Left(
+        Failure(
+          statusCode: dioError.statusCode,
+          message: dioError.message,
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Either<Failure, Comment?>> commentPost({
+    required CommentReq commentReq,
+  }) async {
+    try {
+      final response = await _postDatasource.commentPost(
+        commentReq: commentReq,
+      );
+      return Right(response);
+    } on DioException catch (error) {
+      final dioError = DioExceptions.fromDioError(error);
+      return Left(
+        Failure(
+          statusCode: dioError.statusCode,
+          message: dioError.message,
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<Comment?>>> fetchPostComments({
+    required int postId,
+  }) async {
+    try {
+      final response = await _postDatasource.fetchPostComments(
+        postId: postId,
+      );
+      return Right(response);
+    } on DioException catch (error) {
+      final dioError = DioExceptions.fromDioError(error);
+      return Left(
+        Failure(
+          statusCode: dioError.statusCode,
+          message: dioError.message,
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> likeComment({
+    required int commentId,
+  }) async {
+    try {
+      await _postDatasource.likeComment(
+        commentId: commentId,
+      );
+      return const Right(null);
+    } on DioException catch (error) {
+      final dioError = DioExceptions.fromDioError(error);
+      return Left(
+        Failure(
+          statusCode: dioError.statusCode,
+          message: dioError.message,
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> unlikeComment({
+    required int commentId,
+  }) async {
+    try {
+      await _postDatasource.unlikeComment(
+        commentId: commentId,
+      );
+      return const Right(null);
+    } on DioException catch (error) {
+      final dioError = DioExceptions.fromDioError(error);
+      return Left(
+        Failure(
+          statusCode: dioError.statusCode,
+          message: dioError.message,
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Either<Failure, bool>> isPostFeatured({
+    required int postId,
+  }) async {
+    try {
+      final response = await _postDatasource.isPostFeatured(
+        postId: postId,
+      );
+      return Right(response);
+    } on DioException catch (error) {
+      final dioError = DioExceptions.fromDioError(error);
+      return Left(
+        Failure(
+          statusCode: dioError.statusCode,
+          message: dioError.message,
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Either<Failure, ResponseMsg>> reportPost({
+    required ReportPostReq reportPostReq,
+  }) async {
+    try {
+      final response = await _postDatasource.reportPost(
+        reportPostReq: reportPostReq,
+      );
+      return Right(response);
+    } on DioException catch (error) {
+      final dioError = DioExceptions.fromDioError(error);
+      return Left(
+        Failure(
+          statusCode: dioError.statusCode,
+          message: dioError.message,
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Either<Failure, bool>> isPostReported({
+    required int postId,
+    required String userId,
+  }) async {
+    try {
+      final response = await _postDatasource.isPostReported(
+        postId: postId,
+        userId: userId,
       );
       return Right(response);
     } on DioException catch (error) {

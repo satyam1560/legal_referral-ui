@@ -3,7 +3,6 @@ import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
 import 'package:legal_referral_ui/src/core/config/config.dart';
 import 'package:legal_referral_ui/src/core/network/network.dart';
-import 'package:legal_referral_ui/src/features/auth/domain/domain.dart';
 import 'package:legal_referral_ui/src/features/feed/data/data.dart';
 import 'package:legal_referral_ui/src/features/feed/domain/domain.dart';
 
@@ -28,106 +27,6 @@ class FeedRepositoryImpl extends FeedRepository {
         offset: offset,
       );
       return Right(response);
-    } on DioException catch (error) {
-      final dioError = DioExceptions.fromDioError(error);
-      return Left(
-        Failure(
-          statusCode: dioError.statusCode,
-          message: dioError.message,
-        ),
-      );
-    }
-  }
-
-  @override
-  Future<Either<Failure, List<AppUser?>>> fetchPostLikedUsers({
-    required int postId,
-  }) async {
-    try {
-      final response = await _feedDatasource.fetchPostLikedUsers(
-        postId: postId,
-      );
-      return Right(response);
-    } on DioException catch (error) {
-      final dioError = DioExceptions.fromDioError(error);
-      return Left(
-        Failure(
-          statusCode: dioError.statusCode,
-          message: dioError.message,
-        ),
-      );
-    }
-  }
-
-  @override
-  Future<Either<Failure, Comment?>> commentPost({
-    required CommentReq commentReq,
-  }) async {
-    try {
-      final response = await _feedDatasource.commentPost(
-        commentReq: commentReq,
-      );
-      return Right(response);
-    } on DioException catch (error) {
-      final dioError = DioExceptions.fromDioError(error);
-      return Left(
-        Failure(
-          statusCode: dioError.statusCode,
-          message: dioError.message,
-        ),
-      );
-    }
-  }
-
-  @override
-  Future<Either<Failure, List<Comment?>>> fetchPostComments({
-    required int postId,
-  }) async {
-    try {
-      final response = await _feedDatasource.fetchPostComments(
-        postId: postId,
-      );
-      return Right(response);
-    } on DioException catch (error) {
-      final dioError = DioExceptions.fromDioError(error);
-      return Left(
-        Failure(
-          statusCode: dioError.statusCode,
-          message: dioError.message,
-        ),
-      );
-    }
-  }
-
-  @override
-  Future<Either<Failure, void>> likeComment({
-    required int commentId,
-  }) async {
-    try {
-      await _feedDatasource.likeComment(
-        commentId: commentId,
-      );
-      return const Right(null);
-    } on DioException catch (error) {
-      final dioError = DioExceptions.fromDioError(error);
-      return Left(
-        Failure(
-          statusCode: dioError.statusCode,
-          message: dioError.message,
-        ),
-      );
-    }
-  }
-
-  @override
-  Future<Either<Failure, void>> unlikeComment({
-    required int commentId,
-  }) async {
-    try {
-      await _feedDatasource.unlikeComment(
-        commentId: commentId,
-      );
-      return const Right(null);
     } on DioException catch (error) {
       final dioError = DioExceptions.fromDioError(error);
       return Left(
@@ -181,12 +80,12 @@ class FeedRepositoryImpl extends FeedRepository {
   }
 
   @override
-  Future<Either<Failure, ResponseMsg?>> saveFeaturePost({
-    required SaveFeaturePostReq saveFeaturePostReq,
+  Future<Either<Failure, ResponseMsg?>> featurePost({
+    required FeaturePostReq featurePostReq,
   }) async {
     try {
-      final res = await _feedDatasource.saveFeaturePost(
-        saveFeaturePostReq: saveFeaturePostReq,
+      final res = await _feedDatasource.featurePost(
+        saveFeaturePostReq: featurePostReq,
       );
       return Right(res);
     } on DioException catch (error) {
@@ -201,14 +100,36 @@ class FeedRepositoryImpl extends FeedRepository {
   }
 
   @override
-  Future<Either<Failure, ResponseMsg?>> unSaveFeaturePost({
+  Future<Either<Failure, ResponseMsg?>> unFeaturePost({
     required int postId,
+    required UnFeaturePostReq unFeaturePostReq,
   }) async {
     try {
-      final res = await _feedDatasource.unsaveFeaturePost(
+      final res = await _feedDatasource.unFeaturePost(
         postId: postId,
+        unFeaturePostReq: unFeaturePostReq,
       );
       return Right(res);
+    } on DioException catch (error) {
+      final dioError = DioExceptions.fromDioError(error);
+      return Left(
+        Failure(
+          statusCode: dioError.statusCode,
+          message: dioError.message,
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> ignoreFeed({
+    required int feeId,
+  }) async {
+    try {
+      await _feedDatasource.ignoreFeed(
+        feeId: feeId,
+      );
+      return const Right(null);
     } on DioException catch (error) {
       final dioError = DioExceptions.fromDioError(error);
       return Left(

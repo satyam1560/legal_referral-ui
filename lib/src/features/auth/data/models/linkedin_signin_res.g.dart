@@ -13,7 +13,4 @@ LinkedinSignInRes _$LinkedinSignInResFromJson(Map<String, dynamic> json) =>
     );
 
 Map<String, dynamic> _$LinkedinSignInResToJson(LinkedinSignInRes instance) =>
-    <String, dynamic>{
-      'user_id': instance.userId,
-      'token': instance.token,
-    };
+    <String, dynamic>{'user_id': instance.userId, 'token': instance.token};

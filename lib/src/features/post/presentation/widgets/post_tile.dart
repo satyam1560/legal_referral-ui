@@ -5,7 +5,6 @@ import 'package:go_router/go_router.dart';
 import 'package:legal_referral_ui/src/core/common_widgets/widgets.dart';
 import 'package:legal_referral_ui/src/core/constants/constants.dart';
 import 'package:legal_referral_ui/src/core/utils/utils.dart';
-import 'package:legal_referral_ui/src/features/auth/domain/domain.dart';
 import 'package:legal_referral_ui/src/features/feed/presentation/presentation.dart';
 import 'package:legal_referral_ui/src/features/post/domain/domain.dart';
 import 'package:legal_referral_ui/src/features/post/presentation/presentation.dart';
@@ -14,7 +13,6 @@ import 'package:legal_referral_ui/src/features/profile/presentation/presentation
 class PostTile extends StatelessWidget {
   const PostTile({
     required this.post,
-    required this.user,
     required this.onLikePressed,
     required this.onCommentPressed,
     required this.onDiscussPressed,
@@ -29,7 +27,6 @@ class PostTile extends StatelessWidget {
   });
 
   final Post? post;
-  final AppUser? user;
   final VoidCallback onLikePressed;
   final VoidCallback onCommentPressed;
   final VoidCallback onDiscussPressed;
@@ -43,7 +40,7 @@ class PostTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final name = '${user?.firstName} ${user?.lastName}';
+    final name = '${post?.ownerFirstName} ${post?.ownerLastName}';
     final theme = Theme.of(context).textTheme;
     return ColoredBox(
       color: LegalReferralColors.containerWhite500,
@@ -59,7 +56,7 @@ class PostTile extends StatelessWidget {
               children: [
                 GestureDetector(
                   onTap: () {
-                    final userId = user?.userId;
+                    final userId = post?.ownerId;
                     if (userId != null) {
                       context.pushNamed(
                         ProfilePage.name,
@@ -68,14 +65,13 @@ class PostTile extends StatelessWidget {
                     }
                   },
                   child: CustomAvatar(
-                    imageUrl: user?.avatarUrl,
+                    imageUrl: post?.ownerAvatarUrl,
                     radius: 28.r,
                   ),
                 ),
                 SizedBox(
                   width: 8.w,
                 ),
-
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -100,7 +96,9 @@ class PostTile extends StatelessWidget {
                                 color: LegalReferralColors.textGrey117,
                               ),
                               children: [
-                                TextSpan(text: '${user?.practiceArea ?? ''} '),
+                                TextSpan(
+                                  text: '${post?.ownerPracticeArea ?? ''} ',
+                                ),
                                 const TextSpan(text: ' • 1st'),
                               ],
                             ),
@@ -121,8 +119,6 @@ class PostTile extends StatelessWidget {
                     ],
                   ),
                 ),
-                // Post details options
-
                 SvgButton(
                   height: 24.w,
                   width: 24.h,
@@ -145,7 +141,7 @@ class PostTile extends StatelessWidget {
                     ),
                     text: post?.content ?? '',
                   ),
-                if (post?.type == PostType.link && post?.content != null)
+                if (post?.postType == PostType.link && post?.content != null)
                   Padding(
                     padding: EdgeInsets.symmetric(
                       vertical: 20.h,
@@ -156,9 +152,9 @@ class PostTile extends StatelessWidget {
                   )
                 else
                   MediaPost(
-                    imageHeight: imageHeight,
-                    postType: post?.type ?? PostType.image,
-                    mediaUrls: post?.filesUrls ?? [],
+                    postHeight: imageHeight,
+                    postType: post?.postType ?? PostType.image,
+                    mediaUrls: post?.media ?? [],
                     fileName: post?.content,
                   ),
               ],

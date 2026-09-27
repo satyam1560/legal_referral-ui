@@ -1,6 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:injectable/injectable.dart';
 import 'package:legal_referral_ui/src/core/config/config.dart';
+import 'package:legal_referral_ui/src/features/auth/domain/domain.dart';
 import 'package:legal_referral_ui/src/features/post/data/data.dart';
 import 'package:legal_referral_ui/src/features/post/domain/domain.dart';
 
@@ -36,9 +37,75 @@ class PostUsecase {
     return _postRepository.unlikePost(postId: postId);
   }
 
+  Future<Either<Failure, List<AppUser?>>> fetchPostLikedUsers({
+    required int postId,
+  }) async {
+    return _postRepository.fetchPostLikedUsers(
+      postId: postId,
+    );
+  }
+
   Future<Either<Failure, ResponseMsg>> deletePost({
     required int postId,
   }) async {
     return _postRepository.deletePost(postId: postId);
+  }
+
+  Future<Either<Failure, Comment?>> commentPost({
+    required CommentReq commentReq,
+  }) async {
+    return _postRepository.commentPost(
+      commentReq: commentReq,
+    );
+  }
+
+  Future<Either<Failure, List<Comment?>>> fetchPostComments({
+    required int postId,
+  }) async {
+    return _postRepository.fetchPostComments(
+      postId: postId,
+    );
+  }
+
+  Future<Either<Failure, void>> likeComment({
+    required int commentId,
+  }) async {
+    return _postRepository.likeComment(
+      commentId: commentId,
+    );
+  }
+
+  Future<Either<Failure, void>> unlikeComment({
+    required int commentId,
+  }) async {
+    return _postRepository.unlikeComment(
+      commentId: commentId,
+    );
+  }
+
+  Future<Either<Failure, bool>> isPostFeatured({
+    required int postId,
+  }) async {
+    return _postRepository.isPostFeatured(
+      postId: postId,
+    );
+  }
+
+  Future<Either<Failure, ResponseMsg>> reportPost({
+    required ReportPostReq reportPostReq,
+  }) async {
+    return _postRepository.reportPost(
+      reportPostReq: reportPostReq,
+    );
+  }
+
+  Future<Either<Failure, bool>> isPostReported({
+    required int postId,
+    required String userId,
+  }) async {
+    return _postRepository.isPostReported(
+      postId: postId,
+      userId: userId,
+    );
   }
 }

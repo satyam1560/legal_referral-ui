@@ -6,30 +6,38 @@ part of 'user_profile.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$UserProfileImpl _$$UserProfileImplFromJson(Map<String, dynamic> json) =>
-    _$UserProfileImpl(
-      serviceType:
-          $enumDecodeNullable(_$PriceServiceTypeEnumMap, json['service_type']),
-      userId: json['user_id'] as String?,
-      firstName: json['first_name'] as String?,
-      lastName: json['last_name'] as String?,
-      practiceArea: json['practice_area'] as String?,
-      avatarUrl: json['avatar_url'] as String?,
-      bannerUrl: json['banner_url'] as String?,
-      averageBillingPerClient:
-          (json['average_billing_per_client'] as num?)?.toInt(),
-      caseResolutionRate: (json['case_resolution_rate'] as num?)?.toInt(),
-      openToReferral: json['open_to_referral'] as bool?,
-      about: json['about'] as String?,
-      priceId: (json['price_id'] as num?)?.toInt(),
-      perHourPrice: (json['per_hour_price'] as num?)?.toDouble(),
-      perHearingPrice: (json['per_hearing_price'] as num?)?.toDouble(),
-      contingencyPrice: json['contingency_price'] as String?,
-      hybridPrice: json['hybrid_price'] as String?,
-    );
+_UserProfile _$UserProfileFromJson(Map<String, dynamic> json) => _UserProfile(
+  followersCount: (json['followers_count'] as num).toInt(),
+  connectionsCount: (json['connections_count'] as num).toInt(),
+  serviceType: $enumDecodeNullable(
+    _$PriceServiceTypeEnumMap,
+    json['service_type'],
+  ),
+  userId: json['user_id'] as String?,
+  firstName: json['first_name'] as String?,
+  lastName: json['last_name'] as String?,
+  practiceArea: json['practice_area'] as String?,
+  avatarUrl: json['avatar_url'] as String?,
+  bannerUrl: json['banner_url'] as String?,
+  averageBillingPerClient: (json['average_billing_per_client'] as num?)
+      ?.toInt(),
+  caseResolutionRate: (json['case_resolution_rate'] as num?)?.toInt(),
+  openToReferral: json['open_to_referral'] as bool?,
+  about: json['about'] as String?,
+  priceId: (json['price_id'] as num?)?.toInt(),
+  perHourPrice: (json['per_hour_price'] as num?)?.toDouble(),
+  perHearingPrice: (json['per_hearing_price'] as num?)?.toDouble(),
+  contingencyPrice: json['contingency_price'] as String?,
+  hybridPrice: json['hybrid_price'] as String?,
+  ratingInfo: json['rating_info'] == null
+      ? null
+      : RatingInfo.fromJson(json['rating_info'] as Map<String, dynamic>),
+);
 
-Map<String, dynamic> _$$UserProfileImplToJson(_$UserProfileImpl instance) =>
+Map<String, dynamic> _$UserProfileToJson(_UserProfile instance) =>
     <String, dynamic>{
+      'followers_count': instance.followersCount,
+      'connections_count': instance.connectionsCount,
       'service_type': _$PriceServiceTypeEnumMap[instance.serviceType],
       'user_id': instance.userId,
       'first_name': instance.firstName,
@@ -46,6 +54,7 @@ Map<String, dynamic> _$$UserProfileImplToJson(_$UserProfileImpl instance) =>
       'per_hearing_price': instance.perHearingPrice,
       'contingency_price': instance.contingencyPrice,
       'hybrid_price': instance.hybridPrice,
+      'rating_info': instance.ratingInfo,
     };
 
 const _$PriceServiceTypeEnumMap = {

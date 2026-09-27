@@ -1,7 +1,6 @@
 import 'package:injectable/injectable.dart';
 import 'package:legal_referral_ui/src/core/config/config.dart';
 import 'package:legal_referral_ui/src/core/network/network.dart';
-import 'package:legal_referral_ui/src/features/auth/domain/domain.dart';
 import 'package:legal_referral_ui/src/features/feed/data/data.dart';
 import 'package:legal_referral_ui/src/features/feed/domain/domain.dart';
 
@@ -25,70 +24,6 @@ class FeedDatasource {
         offset,
       );
       return response;
-    } catch (e) {
-      rethrow;
-    }
-  }
-
-  Future<List<AppUser?>> fetchPostLikedUsers({
-    required int postId,
-  }) async {
-    try {
-      final response = await _apiClient.fetchPostLikedUsers(
-        postId,
-      );
-      return response;
-    } catch (e) {
-      rethrow;
-    }
-  }
-
-  Future<Comment?> commentPost({
-    required CommentReq commentReq,
-  }) async {
-    try {
-      final response = await _apiClient.commentPost(
-        commentReq.postId,
-        commentReq,
-      );
-      return response;
-    } catch (e) {
-      rethrow;
-    }
-  }
-
-  Future<List<Comment?>> fetchPostComments({
-    required int postId,
-  }) async {
-    try {
-      final response = await _apiClient.fetchPostComments(
-        postId,
-      );
-      return response;
-    } catch (e) {
-      rethrow;
-    }
-  }
-
-  Future<void> likeComment({
-    required int commentId,
-  }) async {
-    try {
-      await _apiClient.likeComment(
-        commentId,
-      );
-    } catch (e) {
-      rethrow;
-    }
-  }
-
-  Future<void> unlikeComment({
-    required int commentId,
-  }) async {
-    try {
-      await _apiClient.unlikeComment(
-        commentId,
-      );
     } catch (e) {
       rethrow;
     }
@@ -118,11 +53,11 @@ class FeedDatasource {
     }
   }
 
-  Future<ResponseMsg?> saveFeaturePost({
-    required SaveFeaturePostReq saveFeaturePostReq,
+  Future<ResponseMsg?> featurePost({
+    required FeaturePostReq saveFeaturePostReq,
   }) async {
     try {
-      final res = await _apiClient.saveFeaturePost(
+      final res = await _apiClient.featurePost(
         saveFeaturePostReq,
       );
       return res;
@@ -131,14 +66,28 @@ class FeedDatasource {
     }
   }
 
-  Future<ResponseMsg?> unsaveFeaturePost({
+  Future<ResponseMsg?> unFeaturePost({
     required int postId,
+    required UnFeaturePostReq unFeaturePostReq,
   }) async {
     try {
-      final res = await _apiClient.unSaveFeaturePost(
+      final res = await _apiClient.unFeaturePost(
         postId,
+        unFeaturePostReq,
       );
       return res;
+    } catch (_) {
+      rethrow;
+    }
+  }
+
+  Future<void> ignoreFeed({
+    required int feeId,
+  }) async {
+    try {
+      await _apiClient.ignoreFeed(
+        feeId,
+      );
     } catch (_) {
       rethrow;
     }

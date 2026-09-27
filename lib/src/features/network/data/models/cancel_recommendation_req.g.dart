@@ -7,13 +7,11 @@ part of 'cancel_recommendation_req.dart';
 // **************************************************************************
 
 CancelRecommendationReq _$CancelRecommendationReqFromJson(
-        Map<String, dynamic> json) =>
-    CancelRecommendationReq(
-      recommendedUserId: json['recommended_user_id'] as String,
-    );
+  Map<String, dynamic> json,
+) => CancelRecommendationReq(
+  recommendedUserId: json['recommended_user_id'] as String,
+);
 
 Map<String, dynamic> _$CancelRecommendationReqToJson(
-        CancelRecommendationReq instance) =>
-    <String, dynamic>{
-      'recommended_user_id': instance.recommendedUserId,
-    };
+  CancelRecommendationReq instance,
+) => <String, dynamic>{'recommended_user_id': instance.recommendedUserId};

@@ -3,8 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:legal_referral_ui/src/core/common_widgets/widgets.dart';
-import 'package:legal_referral_ui/src/core/constants/colors.dart';
-import 'package:legal_referral_ui/src/core/constants/icon_string_constants.dart';
+import 'package:legal_referral_ui/src/core/constants/constants.dart';
 import 'package:legal_referral_ui/src/core/utils/utils.dart';
 import 'package:legal_referral_ui/src/features/feed/domain/domain.dart';
 import 'package:legal_referral_ui/src/features/feed/presentation/presentation.dart';
@@ -17,11 +16,11 @@ class FeedTile extends StatelessWidget {
     required this.feed,
     required this.onLikePressed,
     required this.onCommentPressed,
-    required this.onDiscussPressed,
-    required this.onSharePressed,
     required this.isLiked,
     required this.likesCount,
     required this.commentsCount,
+    this.onSharePressed,
+    this.onDiscussPressed,
     this.onTap,
     this.onOptionsPressed,
     this.imageHeight = 380,
@@ -31,8 +30,8 @@ class FeedTile extends StatelessWidget {
   final Feed? feed;
   final VoidCallback onLikePressed;
   final VoidCallback onCommentPressed;
-  final VoidCallback onDiscussPressed;
-  final VoidCallback onSharePressed;
+  final VoidCallback? onDiscussPressed;
+  final VoidCallback? onSharePressed;
   final double imageHeight;
   final bool isLiked;
   final int likesCount;
@@ -42,8 +41,8 @@ class FeedTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final feedPost = feed?.feedPost;
-    final name = '${feedPost?.ownerFirstName} ${feedPost?.ownerLastName}';
+    final post = feed?.post;
+    final name = '${post?.ownerFirstName} ${post?.ownerLastName}';
     final theme = Theme.of(context).textTheme;
     return ColoredBox(
       color: LegalReferralColors.containerWhite500,
@@ -59,7 +58,7 @@ class FeedTile extends StatelessWidget {
               children: [
                 GestureDetector(
                   onTap: () {
-                    final userId = feedPost?.ownerId;
+                    final userId = post?.ownerId;
                     if (userId != null) {
                       context.pushNamed(
                         ProfilePage.name,
@@ -68,7 +67,7 @@ class FeedTile extends StatelessWidget {
                     }
                   },
                   child: CustomAvatar(
-                    imageUrl: feedPost?.ownerAvatarUrl,
+                    imageUrl: post?.ownerAvatarUrl,
                     radius: 28.r,
                   ),
                 ),
@@ -88,8 +87,8 @@ class FeedTile extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                      SizedBox(
-                        height: 2.h,
+                      const SizedBox(
+                        height: 2,
                       ),
                       Row(
                         children: [
@@ -100,7 +99,7 @@ class FeedTile extends StatelessWidget {
                               ),
                               children: [
                                 TextSpan(
-                                  text: '${feedPost?.ownerPracticeArea ?? ''} ',
+                                  text: '${post?.ownerPracticeArea ?? ''} ',
                                 ),
                                 const TextSpan(text: ' • 1st'),
                               ],
@@ -109,11 +108,11 @@ class FeedTile extends StatelessWidget {
                           ),
                         ],
                       ),
-                      SizedBox(
-                        height: 2.8.h,
+                      const SizedBox(
+                        height: 1,
                       ),
                       Text(
-                        DateTimeUtil.timeAgo(feed?.feedPost?.createdAt),
+                        DateTimeUtil.timeAgo(feed?.post?.createdAt),
                         style: theme.bodyMedium?.copyWith(
                           color: LegalReferralColors.textGrey117,
                           fontSize: 12.sp,
@@ -137,30 +136,29 @@ class FeedTile extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                if (feedPost?.content != null && feedPost!.content!.isNotEmpty)
+                if (post?.content != null && post!.content!.isNotEmpty)
                   ExpandableText(
                     padding: EdgeInsets.symmetric(
                       horizontal: 16.w,
                       vertical: 8.h,
                     ),
-                    text: feedPost.content ?? '',
+                    text: post.content ?? '',
                   ),
-                if (feedPost?.postType == PostType.link &&
-                    feedPost?.content != null)
+                if (post?.postType == PostType.link && post?.content != null)
                   Padding(
                     padding: EdgeInsets.symmetric(
                       vertical: 20.h,
                     ),
                     child: LinkPreviewWidget(
-                      text: feedPost!.content!,
+                      text: post!.content!,
                     ),
                   )
                 else
                   MediaPost(
-                    imageHeight: imageHeight,
-                    postType: feedPost?.postType ?? PostType.image,
-                    mediaUrls: feedPost?.media ?? [],
-                    fileName: feedPost?.content,
+                    postHeight: imageHeight,
+                    postType: post?.postType ?? PostType.image,
+                    mediaUrls: post?.media ?? [],
+                    fileName: post?.content,
                   ),
               ],
             ),

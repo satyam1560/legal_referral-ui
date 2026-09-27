@@ -1,4 +1,5 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// dart format width=80
 
 // **************************************************************************
 // InjectableConfigGenerator
@@ -138,160 +139,256 @@ import '../utils/local_notification_util.dart' as _i820;
 import 'register_module.dart' as _i291;
 
 extension GetItInjectableX on _i174.GetIt {
-// initializes the registration of main-scope dependencies inside of GetIt
+  // initializes the registration of main-scope dependencies inside of GetIt
   _i174.GetIt init({
     String? environment,
     _i526.EnvironmentFilter? environmentFilter,
   }) {
-    final gh = _i526.GetItHelper(
-      this,
-      environment,
-      environmentFilter,
-    );
+    final gh = _i526.GetItHelper(this, environment, environmentFilter);
     final registerModule = _$RegisterModule();
     gh.singleton<_i855.APIClient>(() => registerModule.apiClient());
     gh.singleton<_i704.AuthDataSource>(() => registerModule.authDataSource());
     gh.singleton<_i323.WizardDataSource>(
-        () => registerModule.wizardDataSource());
-    gh.lazySingleton<_i820.LocalNotificationUtil>(
-        () => _i820.LocalNotificationUtil());
-    gh.singleton<_i48.ReferralDataSource>(
-        () => _i48.ReferralDataSource(apiClient: gh<_i855.APIClient>()));
-    gh.singleton<_i121.PostDatasource>(
-        () => _i121.PostDatasource(apiClient: gh<_i557.APIClient>()));
-    gh.singleton<_i273.ChatDataSource>(
-        () => _i273.ChatDataSource(apiClient: gh<_i855.APIClient>()));
-    gh.singleton<_i994.NetworkDataSource>(
-        () => _i994.NetworkDataSource(apiClient: gh<_i557.APIClient>()));
-    gh.singleton<_i451.FirmDataSource>(
-        () => _i451.FirmDataSource(apiClient: gh<_i855.APIClient>()));
-    gh.singleton<_i553.ProfileDataSource>(
-        () => _i553.ProfileDataSource(apiClient: gh<_i855.APIClient>()));
-    gh.singleton<_i618.SavedPostsDatasource>(
-        () => _i618.SavedPostsDatasource(apiClient: gh<_i855.APIClient>()));
-    gh.singleton<_i787.FeedDatasource>(
-        () => _i787.FeedDatasource(apiClient: gh<_i855.APIClient>()));
-    gh.singleton<_i78.AdDatasource>(
-        () => _i78.AdDatasource(apiClient: gh<_i855.APIClient>()));
-    gh.singleton<_i1048.AccountDatasource>(
-        () => _i1048.AccountDatasource(apiClient: gh<_i557.APIClient>()));
-    gh.singleton<_i219.DiscussionDatasource>(
-        () => _i219.DiscussionDatasource(apiClient: gh<_i557.APIClient>()));
-    gh.singleton<_i200.NotificationsDatasource>(
-        () => _i200.NotificationsDatasource(apiClient: gh<_i557.APIClient>()));
-    gh.lazySingleton<_i566.SearchDataSource>(
-        () => _i566.SearchDataSource(apiClient: gh<_i855.APIClient>()));
-    gh.lazySingleton<_i931.DiscussionRepository>(() =>
-        _i425.DiscussionRepositoryImpl(
-            discussionDatasource: gh<_i238.DiscussionDatasource>()));
-    gh.factory<String>(
-      () => registerModule.baseUrl,
-      instanceName: 'baseUrl',
+      () => registerModule.wizardDataSource(),
     );
-    gh.lazySingleton<_i57.WizardRepository>(() => _i888.WizardRepositoryImpl(
-        wizardDataSource: gh<_i323.WizardDataSource>()));
-    gh.lazySingleton<_i318.NetworkRepository>(() => _i109.NetworkRepositoryImpl(
-        networkDataSource: gh<_i384.NetworkDataSource>()));
+    gh.lazySingleton<_i820.LocalNotificationUtil>(
+      () => _i820.LocalNotificationUtil(),
+    );
+    gh.lazySingleton<_i57.WizardRepository>(
+      () => _i888.WizardRepositoryImpl(
+        wizardDataSource: gh<_i323.WizardDataSource>(),
+      ),
+    );
+    gh.factory<String>(() => registerModule.baseUrl, instanceName: 'baseUrl');
+    gh.lazySingleton<_i974.WizardUseCase>(
+      () => _i974.WizardUseCase(wizardRepository: gh<_i57.WizardRepository>()),
+    );
+    gh.lazySingleton<_i140.AuthRepository>(
+      () =>
+          _i153.AuthRepositoryImpl(authDataSource: gh<_i704.AuthDataSource>()),
+    );
+    gh.singleton<_i1048.AccountDatasource>(
+      () => _i1048.AccountDatasource(apiClient: gh<_i557.APIClient>()),
+    );
+    gh.singleton<_i78.AdDatasource>(
+      () => _i78.AdDatasource(apiClient: gh<_i855.APIClient>()),
+    );
+    gh.singleton<_i273.ChatDataSource>(
+      () => _i273.ChatDataSource(apiClient: gh<_i855.APIClient>()),
+    );
+    gh.singleton<_i219.DiscussionDatasource>(
+      () => _i219.DiscussionDatasource(apiClient: gh<_i557.APIClient>()),
+    );
+    gh.singleton<_i787.FeedDatasource>(
+      () => _i787.FeedDatasource(apiClient: gh<_i855.APIClient>()),
+    );
+    gh.singleton<_i451.FirmDataSource>(
+      () => _i451.FirmDataSource(apiClient: gh<_i855.APIClient>()),
+    );
+    gh.singleton<_i994.NetworkDataSource>(
+      () => _i994.NetworkDataSource(apiClient: gh<_i557.APIClient>()),
+    );
+    gh.singleton<_i200.NotificationsDatasource>(
+      () => _i200.NotificationsDatasource(apiClient: gh<_i557.APIClient>()),
+    );
+    gh.singleton<_i121.PostDatasource>(
+      () => _i121.PostDatasource(apiClient: gh<_i557.APIClient>()),
+    );
+    gh.singleton<_i553.ProfileDataSource>(
+      () => _i553.ProfileDataSource(apiClient: gh<_i855.APIClient>()),
+    );
+    gh.singleton<_i48.ReferralDataSource>(
+      () => _i48.ReferralDataSource(apiClient: gh<_i855.APIClient>()),
+    );
+    gh.singleton<_i618.SavedPostsDatasource>(
+      () => _i618.SavedPostsDatasource(apiClient: gh<_i855.APIClient>()),
+    );
+    gh.lazySingleton<_i566.SearchDataSource>(
+      () => _i566.SearchDataSource(apiClient: gh<_i855.APIClient>()),
+    );
     gh.lazySingleton<_i520.AdRepository>(
-        () => _i202.AdRepositoryImpl(adDatasource: gh<_i161.AdDatasource>()));
-    gh.lazySingleton<_i40.FeedRepository>(() =>
-        _i452.FeedRepositoryImpl(feedDatasource: gh<_i84.FeedDatasource>()));
-    gh.lazySingleton<_i808.AccountRepository>(() => _i857.AccountRepositoryImpl(
-        accountDatasource: gh<_i970.AccountDatasource>()));
-    gh.lazySingleton<_i772.AccountUsecase>(() =>
-        _i772.AccountUsecase(accountRepository: gh<_i808.AccountRepository>()));
-    gh.lazySingleton<_i661.NotificationsRepository>(() =>
-        _i201.NotificationsRepositoryImpl(
-            notificationsDatasource: gh<_i566.NotificationsDatasource>()));
-    gh.lazySingleton<_i386.ReferralRepository>(() =>
-        _i750.ReferralRepositoryImpl(
-            referralDataSource: gh<_i622.ReferralDataSource>()));
-    gh.lazySingleton<_i262.PostRepository>(() =>
-        _i1039.PostRepositoryImpl(postDatasource: gh<_i1069.PostDatasource>()));
+      () => _i202.AdRepositoryImpl(adDatasource: gh<_i161.AdDatasource>()),
+    );
+    gh.lazySingleton<_i1003.ChatRepository>(
+      () =>
+          _i504.ChatRepositoryImpl(chatDataSource: gh<_i891.ChatDataSource>()),
+    );
+    gh.lazySingleton<_i931.DiscussionRepository>(
+      () => _i425.DiscussionRepositoryImpl(
+        discussionDatasource: gh<_i238.DiscussionDatasource>(),
+      ),
+    );
+    gh.lazySingleton<_i1062.SavedPostsRepository>(
+      () => _i595.SavedPostsRepositoryImpl(
+        savedPostsDatasource: gh<_i358.SavedPostsDatasource>(),
+      ),
+    );
+    gh.lazySingleton<_i386.ReferralRepository>(
+      () => _i750.ReferralRepositoryImpl(
+        referralDataSource: gh<_i622.ReferralDataSource>(),
+      ),
+    );
     gh.lazySingleton<_i551.AdUsecase>(
-        () => _i551.AdUsecase(adRepository: gh<_i520.AdRepository>()));
-    gh.lazySingleton<_i1003.ChatRepository>(() =>
-        _i504.ChatRepositoryImpl(chatDataSource: gh<_i891.ChatDataSource>()));
+      () => _i551.AdUsecase(adRepository: gh<_i520.AdRepository>()),
+    );
+    gh.lazySingleton<_i262.PostRepository>(
+      () => _i1039.PostRepositoryImpl(
+        postDatasource: gh<_i1069.PostDatasource>(),
+      ),
+    );
     gh.factory<_i132.AdBloc>(
-        () => _i132.AdBloc(adUsecase: gh<_i520.AdUsecase>()));
-    gh.lazySingleton<_i193.ProfileRepository>(() => _i334.ProfileRepositoryImpl(
-        profileDataSource: gh<_i49.ProfileDataSource>()));
-    gh.lazySingleton<_i357.SearchRepository>(() => _i1017.SearchRepositoryImpl(
-        searchDataSource: gh<_i461.SearchDataSource>()));
-    gh.lazySingleton<_i430.PostUsecase>(
-        () => _i430.PostUsecase(postRepository: gh<_i262.PostRepository>()));
-    gh.lazySingleton<_i356.DiscussionUsecase>(() => _i356.DiscussionUsecase(
-        discussionRepository: gh<_i931.DiscussionRepository>()));
-    gh.lazySingleton<_i995.FeedUsecase>(
-        () => _i995.FeedUsecase(feedRepository: gh<_i40.FeedRepository>()));
-    gh.factory<_i708.AccountBloc>(
-        () => _i708.AccountBloc(accountUsecase: gh<_i808.AccountUsecase>()));
-    gh.lazySingleton<_i140.AuthRepository>(() =>
-        _i153.AuthRepositoryImpl(authDataSource: gh<_i704.AuthDataSource>()));
+      () => _i132.AdBloc(adUsecase: gh<_i520.AdUsecase>()),
+    );
+    gh.lazySingleton<_i357.SearchRepository>(
+      () => _i1017.SearchRepositoryImpl(
+        searchDataSource: gh<_i461.SearchDataSource>(),
+      ),
+    );
+    gh.lazySingleton<_i318.NetworkRepository>(
+      () => _i109.NetworkRepositoryImpl(
+        networkDataSource: gh<_i384.NetworkDataSource>(),
+      ),
+    );
     gh.lazySingleton<_i569.ChatUseCase>(
-        () => _i569.ChatUseCase(chatRepository: gh<_i1003.ChatRepository>()));
-    gh.lazySingleton<_i436.AuthUseCase>(
-        () => _i436.AuthUseCase(authRepository: gh<_i140.AuthRepository>()));
-    gh.lazySingleton<_i133.FirmRepository>(() =>
-        _i689.FirmRepositoryImpl(firmDataSource: gh<_i300.FirmDataSource>()));
-    gh.lazySingleton<_i996.ProfileUseCase>(() =>
-        _i996.ProfileUseCase(profileRepository: gh<_i193.ProfileRepository>()));
-    gh.lazySingleton<_i1062.SavedPostsRepository>(() =>
-        _i595.SavedPostsRepositoryImpl(
-            savedPostsDatasource: gh<_i358.SavedPostsDatasource>()));
-    gh.lazySingleton<_i974.WizardUseCase>(() =>
-        _i974.WizardUseCase(wizardRepository: gh<_i57.WizardRepository>()));
-    gh.lazySingleton<_i40.NotificationsUsecase>(() => _i40.NotificationsUsecase(
-        notificationsRepository: gh<_i661.NotificationsRepository>()));
-    gh.lazySingleton<_i573.NetworkUseCase>(() =>
-        _i573.NetworkUseCase(networkRepository: gh<_i318.NetworkRepository>()));
-    gh.lazySingleton<_i797.AuthBloc>(
-        () => _i797.AuthBloc(authUseCase: gh<_i140.AuthUseCase>()));
-    gh.lazySingleton<_i1053.SearchUseCase>(() =>
-        _i1053.SearchUseCase(searchRepository: gh<_i686.SearchRepository>()));
-    gh.lazySingleton<_i398.ReferralUseCases>(() => _i398.ReferralUseCases(
-        referralRepository: gh<_i386.ReferralRepository>()));
-    gh.factory<_i65.ChatBloc>(() => _i65.ChatBloc(
-          authBloc: gh<_i481.AuthBloc>(),
-          networkUseCase: gh<_i318.NetworkUseCase>(),
-          chatUseCase: gh<_i1003.ChatUseCase>(),
-        ));
-    gh.factory<_i1041.NotificationsBloc>(() => _i1041.NotificationsBloc(
-        notificationsUsecase: gh<_i661.NotificationsUsecase>()));
-    gh.factory<_i469.ProfileBloc>(() => _i469.ProfileBloc(
-          authBloc: gh<_i481.AuthBloc>(),
-          profileUseCase: gh<_i193.ProfileUseCase>(),
-        ));
-    gh.factory<_i896.PostBloc>(
-        () => _i896.PostBloc(postUsecase: gh<_i262.PostUsecase>()));
-    gh.lazySingleton<_i492.SavedPostsUsecase>(() => _i492.SavedPostsUsecase(
-        savedPostsRepository: gh<_i1062.SavedPostsRepository>()));
-    gh.lazySingleton<_i167.FirmUseCase>(
-        () => _i167.FirmUseCase(firmRepository: gh<_i133.FirmRepository>()));
+      () => _i569.ChatUseCase(chatRepository: gh<_i1003.ChatRepository>()),
+    );
     gh.factory<_i991.WizardBloc>(
-        () => _i991.WizardBloc(wizardUseCase: gh<_i974.WizardUseCase>()));
-    gh.factory<_i179.NetworkBloc>(
-        () => _i179.NetworkBloc(networkUseCase: gh<_i318.NetworkUseCase>()));
-    gh.factory<_i355.DiscussionBloc>(() => _i355.DiscussionBloc(
-          authBloc: gh<_i481.AuthBloc>(),
-          discussionUsecase: gh<_i931.DiscussionUsecase>(),
-        ));
-    gh.factory<_i370.FirmBloc>(() => _i370.FirmBloc(
-          firmUsecase: gh<_i133.FirmUseCase>(),
-          profileUseCase: gh<_i193.ProfileUseCase>(),
-        ));
+      () => _i991.WizardBloc(wizardUseCase: gh<_i974.WizardUseCase>()),
+    );
+    gh.lazySingleton<_i436.AuthUseCase>(
+      () => _i436.AuthUseCase(authRepository: gh<_i140.AuthRepository>()),
+    );
+    gh.lazySingleton<_i40.FeedRepository>(
+      () => _i452.FeedRepositoryImpl(feedDatasource: gh<_i84.FeedDatasource>()),
+    );
+    gh.lazySingleton<_i193.ProfileRepository>(
+      () => _i334.ProfileRepositoryImpl(
+        profileDataSource: gh<_i49.ProfileDataSource>(),
+      ),
+    );
+    gh.lazySingleton<_i808.AccountRepository>(
+      () => _i857.AccountRepositoryImpl(
+        accountDatasource: gh<_i970.AccountDatasource>(),
+      ),
+    );
+    gh.lazySingleton<_i661.NotificationsRepository>(
+      () => _i201.NotificationsRepositoryImpl(
+        notificationsDatasource: gh<_i566.NotificationsDatasource>(),
+      ),
+    );
+    gh.lazySingleton<_i133.FirmRepository>(
+      () =>
+          _i689.FirmRepositoryImpl(firmDataSource: gh<_i300.FirmDataSource>()),
+    );
+    gh.lazySingleton<_i167.FirmUseCase>(
+      () => _i167.FirmUseCase(firmRepository: gh<_i133.FirmRepository>()),
+    );
+    gh.lazySingleton<_i430.PostUsecase>(
+      () => _i430.PostUsecase(postRepository: gh<_i262.PostRepository>()),
+    );
+    gh.lazySingleton<_i797.AuthBloc>(
+      () => _i797.AuthBloc(authUseCase: gh<_i140.AuthUseCase>()),
+    );
+    gh.lazySingleton<_i40.NotificationsUsecase>(
+      () => _i40.NotificationsUsecase(
+        notificationsRepository: gh<_i661.NotificationsRepository>(),
+      ),
+    );
+    gh.lazySingleton<_i356.DiscussionUsecase>(
+      () => _i356.DiscussionUsecase(
+        discussionRepository: gh<_i931.DiscussionRepository>(),
+      ),
+    );
+    gh.factory<_i896.PostBloc>(
+      () => _i896.PostBloc(postUsecase: gh<_i262.PostUsecase>()),
+    );
+    gh.lazySingleton<_i492.SavedPostsUsecase>(
+      () => _i492.SavedPostsUsecase(
+        savedPostsRepository: gh<_i1062.SavedPostsRepository>(),
+      ),
+    );
+    gh.lazySingleton<_i398.ReferralUseCases>(
+      () => _i398.ReferralUseCases(
+        referralRepository: gh<_i386.ReferralRepository>(),
+      ),
+    );
+    gh.lazySingleton<_i573.NetworkUseCase>(
+      () => _i573.NetworkUseCase(
+        networkRepository: gh<_i318.NetworkRepository>(),
+      ),
+    );
+    gh.lazySingleton<_i995.FeedUsecase>(
+      () => _i995.FeedUsecase(feedRepository: gh<_i40.FeedRepository>()),
+    );
+    gh.lazySingleton<_i772.AccountUsecase>(
+      () => _i772.AccountUsecase(
+        accountRepository: gh<_i808.AccountRepository>(),
+      ),
+    );
+    gh.lazySingleton<_i1053.SearchUseCase>(
+      () =>
+          _i1053.SearchUseCase(searchRepository: gh<_i686.SearchRepository>()),
+    );
+    gh.factory<_i708.AccountBloc>(
+      () => _i708.AccountBloc(accountUsecase: gh<_i808.AccountUsecase>()),
+    );
+    gh.factory<_i1041.NotificationsBloc>(
+      () => _i1041.NotificationsBloc(
+        notificationsUsecase: gh<_i661.NotificationsUsecase>(),
+      ),
+    );
     gh.factory<_i552.SearchBloc>(
-        () => _i552.SearchBloc(searchUseCase: gh<_i686.SearchUseCase>()));
-    gh.factory<_i494.ReferralBloc>(() =>
-        _i494.ReferralBloc(referralUseCases: gh<_i386.ReferralUseCases>()));
-    gh.singleton<_i774.FeedBloc>(() => _i774.FeedBloc(
-          feedUsecase: gh<_i40.FeedUsecase>(),
-          postUsecase: gh<_i262.PostUsecase>(),
-          savedPostUseCase: gh<_i1062.SavedPostsUsecase>(),
-          authBloc: gh<_i481.AuthBloc>(),
-        ));
-    gh.factory<_i192.SavedPostsBloc>(() => _i192.SavedPostsBloc(
-        savedPostsUsecase: gh<_i1062.SavedPostsUsecase>()));
+      () => _i552.SearchBloc(searchUseCase: gh<_i686.SearchUseCase>()),
+    );
+    gh.factory<_i192.SavedPostsBloc>(
+      () => _i192.SavedPostsBloc(
+        savedPostsUsecase: gh<_i1062.SavedPostsUsecase>(),
+      ),
+    );
+    gh.lazySingleton<_i996.ProfileUseCase>(
+      () => _i996.ProfileUseCase(
+        profileRepository: gh<_i193.ProfileRepository>(),
+      ),
+    );
+    gh.factory<_i355.DiscussionBloc>(
+      () => _i355.DiscussionBloc(
+        authBloc: gh<_i481.AuthBloc>(),
+        discussionUsecase: gh<_i931.DiscussionUsecase>(),
+      ),
+    );
+    gh.factory<_i65.ChatBloc>(
+      () => _i65.ChatBloc(
+        authBloc: gh<_i481.AuthBloc>(),
+        networkUseCase: gh<_i318.NetworkUseCase>(),
+        chatUseCase: gh<_i1003.ChatUseCase>(),
+      ),
+    );
+    gh.factory<_i179.NetworkBloc>(
+      () => _i179.NetworkBloc(networkUseCase: gh<_i318.NetworkUseCase>()),
+    );
+    gh.factory<_i494.ReferralBloc>(
+      () => _i494.ReferralBloc(referralUseCases: gh<_i386.ReferralUseCases>()),
+    );
+    gh.factory<_i469.ProfileBloc>(
+      () => _i469.ProfileBloc(
+        authBloc: gh<_i481.AuthBloc>(),
+        profileUseCase: gh<_i193.ProfileUseCase>(),
+      ),
+    );
+    gh.singleton<_i774.FeedBloc>(
+      () => _i774.FeedBloc(
+        feedUsecase: gh<_i40.FeedUsecase>(),
+        postUsecase: gh<_i262.PostUsecase>(),
+        savedPostUseCase: gh<_i1062.SavedPostsUsecase>(),
+        authBloc: gh<_i481.AuthBloc>(),
+      ),
+    );
+    gh.factory<_i370.FirmBloc>(
+      () => _i370.FirmBloc(
+        firmUsecase: gh<_i133.FirmUseCase>(),
+        profileUseCase: gh<_i193.ProfileUseCase>(),
+      ),
+    );
     return this;
   }
 }

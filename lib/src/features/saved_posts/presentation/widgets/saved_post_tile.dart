@@ -85,6 +85,7 @@ class SavedPostTile extends StatelessWidget {
                               ),
                               children: [
                                 TextSpan(text: '${user?.practiceArea ?? ''} '),
+                                // TODO: Replace with actual data
                                 const TextSpan(text: ' • 1st'),
                               ],
                             ),
@@ -121,7 +122,7 @@ class SavedPostTile extends StatelessWidget {
                     ),
                     text: post.content ?? '',
                   ),
-                if (post?.type == PostType.link && post?.content != null)
+                if (post?.postType == PostType.link && post?.content != null)
                   Padding(
                     padding: EdgeInsets.symmetric(
                       vertical: 20.h,
@@ -132,9 +133,9 @@ class SavedPostTile extends StatelessWidget {
                   )
                 else
                   MediaPost(
-                    imageHeight: imageHeight,
-                    postType: post?.type ?? PostType.image,
-                    mediaUrls: post?.filesUrls ?? [],
+                    postHeight: imageHeight,
+                    postType: post?.postType ?? PostType.image,
+                    mediaUrls: post?.media ?? [],
                     fileName: post?.content,
                   ),
               ],

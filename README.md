@@ -1,28 +1,17 @@
-## Legal Referral UI
-![image](https://github.com/user-attachments/assets/096f461d-e5f9-4eed-830c-f0cb7e5f24f2)
-## APP SIGNING
-keytool -genkey -v -keystore ~/legal-referral-dev.jks -keyalg RSA -keysize 2048 -validity 10000 -alias androiddevkey
-/gradlew signingReport
+# legal_referral_ui
 
-## Merge a local branch with a remote branch
-    git merge origin/aRemoteBranch
-    
-## Abort a rebase    
-    git rebase --abort
+A new Flutter project.
 
-## Reset a commit
-    git reset --hard HEAD@{1}   
+## Getting Started
 
-## Generate Code
-    dart run build_runner build --delete-conflicting-outputs
+This project is a starting point for a Flutter application.
 
-## Build APK
-    flutter build apk --release --no-tree-shake-icons
+A few resources to get you started if this is your first Flutter project:
 
-## Web HTML Render
-    flutter run -d chrome --web-renderer html
+- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
+- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
+- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
 
-## Build Runner Clean
-dart run build_runner clean
-
-
+For help getting started with Flutter development, view the
+[online documentation](https://docs.flutter.dev/), which offers tutorials,
+samples, guidance on mobile development, and a full API reference.

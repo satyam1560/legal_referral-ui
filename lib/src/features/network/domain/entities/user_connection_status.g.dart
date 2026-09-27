@@ -6,17 +6,17 @@ part of 'user_connection_status.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$UserConnectionStatusImpl _$$UserConnectionStatusImplFromJson(
-        Map<String, dynamic> json) =>
-    _$UserConnectionStatusImpl(
-      status: $enumDecode(_$ConnectionInvitationStatusEnumMap, json['status']),
-    );
+_UserConnectionStatus _$UserConnectionStatusFromJson(
+  Map<String, dynamic> json,
+) => _UserConnectionStatus(
+  status: $enumDecode(_$ConnectionInvitationStatusEnumMap, json['status']),
+);
 
-Map<String, dynamic> _$$UserConnectionStatusImplToJson(
-        _$UserConnectionStatusImpl instance) =>
-    <String, dynamic>{
-      'status': _$ConnectionInvitationStatusEnumMap[instance.status]!,
-    };
+Map<String, dynamic> _$UserConnectionStatusToJson(
+  _UserConnectionStatus instance,
+) => <String, dynamic>{
+  'status': _$ConnectionInvitationStatusEnumMap[instance.status]!,
+};
 
 const _$ConnectionInvitationStatusEnumMap = {
   ConnectionInvitationStatus.pending: 'pending',

@@ -16,9 +16,9 @@ CreateDiscussionReq _$CreateDiscussionReqFromJson(Map<String, dynamic> json) =>
     );
 
 Map<String, dynamic> _$CreateDiscussionReqToJson(
-        CreateDiscussionReq instance) =>
-    <String, dynamic>{
-      'author_id': instance.authorId,
-      'topic': instance.topic,
-      'invited_user_ids': instance.invitedUserIds,
-    };
+  CreateDiscussionReq instance,
+) => <String, dynamic>{
+  'author_id': instance.authorId,
+  'topic': instance.topic,
+  'invited_user_ids': instance.invitedUserIds,
+};

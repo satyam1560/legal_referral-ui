@@ -3,7 +3,9 @@ import 'dart:io';
 import 'package:dartz/dartz.dart';
 import 'package:legal_referral_ui/src/core/config/config.dart';
 import 'package:legal_referral_ui/src/features/auth/domain/domain.dart';
+import 'package:legal_referral_ui/src/features/feed/data/data.dart';
 import 'package:legal_referral_ui/src/features/firm/domain/domain.dart';
+import 'package:legal_referral_ui/src/features/post/domain/domain.dart';
 import 'package:legal_referral_ui/src/features/profile/data/data.dart';
 import 'package:legal_referral_ui/src/features/profile/domain/domain.dart';
 
@@ -108,11 +110,28 @@ abstract class ProfileRepository {
     required int educationId,
   });
 
-  Future<Either<Failure, ResponseMsg?>> unSaveFeaturePost({
+  Future<Either<Failure, ResponseMsg?>> unFeaturePost({
     required int postId,
+    required UnFeaturePostReq unFeaturePostReq,
   });
 
   Future<Either<Failure, List<FeaturePost>>> fetchFeaturePosts({
     required String userId,
+  });
+
+  Future<Either<Failure, int>> fetchUserFollowersCount({
+    required String userId,
+  });
+
+  Future<Either<Failure, List<Post>>> fetchActivityPosts({
+    required String userId,
+    required int limit,
+    required int offset,
+  });
+
+  Future<Either<Failure, List<Comment>>> fetchActivityComments({
+    required String userId,
+    required int limit,
+    required int offset,
   });
 }

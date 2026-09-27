@@ -28,20 +28,26 @@ class FeedRefreshed extends FeedEvent {
 
 class FeedPostLiked extends FeedEvent {
   const FeedPostLiked({
-    required this.userId,
-    required this.senderId,
+    required this.postOwnerId,
+    required this.currentUserId,
     required this.postId,
     required this.index,
     required this.isFromeDetails,
   });
-  final String userId;
-  final String senderId;
+  final String postOwnerId;
+  final String currentUserId;
   final int postId;
   final int index;
   final bool isFromeDetails;
 
   @override
-  List<Object> get props => [userId, senderId, postId, index, isFromeDetails];
+  List<Object> get props => [
+        postOwnerId,
+        currentUserId,
+        postId,
+        index,
+        isFromeDetails,
+      ];
 }
 
 class FeedPostUnliked extends FeedEvent {
@@ -58,8 +64,8 @@ class FeedPostUnliked extends FeedEvent {
   List<Object> get props => [postId, index, isFromeDetails];
 }
 
-class PostLikedUsersFetched extends FeedEvent {
-  const PostLikedUsersFetched({
+class FeedPostLikedUsersFetched extends FeedEvent {
+  const FeedPostLikedUsersFetched({
     required this.postId,
   });
   final int postId;
@@ -68,8 +74,8 @@ class PostLikedUsersFetched extends FeedEvent {
   List<Object> get props => [postId];
 }
 
-class Commented extends FeedEvent {
-  const Commented({
+class FeedPostCommented extends FeedEvent {
+  const FeedPostCommented({
     required this.comment,
     required this.user,
     required this.index,
@@ -79,8 +85,8 @@ class Commented extends FeedEvent {
   final int index;
 }
 
-class CommentsFetched extends FeedEvent {
-  const CommentsFetched({
+class FeedPostCommentsFetched extends FeedEvent {
+  const FeedPostCommentsFetched({
     required this.postId,
   });
   final int postId;
@@ -89,8 +95,8 @@ class CommentsFetched extends FeedEvent {
   List<Object> get props => [postId];
 }
 
-class CommentLiked extends FeedEvent {
-  const CommentLiked({
+class FeedPostCommentLiked extends FeedEvent {
+  const FeedPostCommentLiked({
     required this.commentId,
   });
   final int commentId;
@@ -99,8 +105,8 @@ class CommentLiked extends FeedEvent {
   List<Object> get props => [commentId];
 }
 
-class CommentUnliked extends FeedEvent {
-  const CommentUnliked({
+class FeedPostCommentUnliked extends FeedEvent {
+  const FeedPostCommentUnliked({
     required this.commentId,
   });
   final int commentId;
@@ -116,8 +122,8 @@ class FeedDetailsInitialized extends FeedEvent {
   final Feed? feed;
 }
 
-class ParentCommentIdChanged extends FeedEvent {
-  const ParentCommentIdChanged({
+class FeedPostParentCommentIdChanged extends FeedEvent {
+  const FeedPostParentCommentIdChanged({
     required this.parentCommentId,
   });
   final int parentCommentId;
@@ -158,8 +164,20 @@ class PostSaved extends FeedEvent {
   List<Object> get props => [userId, postId];
 }
 
-class FeaturePostSaved extends FeedEvent {
-  const FeaturePostSaved({
+class FeedPostFeatured extends FeedEvent {
+  const FeedPostFeatured({
+    required this.userId,
+    required this.postId,
+  });
+  final String userId;
+  final int postId;
+
+  @override
+  List<Object> get props => [userId, postId];
+}
+
+class FeedPostUnFeatured extends FeedEvent {
+  const FeedPostUnFeatured({
     required this.userId,
     required this.postId,
   });
@@ -178,4 +196,84 @@ class PostDeleted extends FeedEvent {
 
   @override
   List<Object> get props => [postId];
+}
+
+class FeedActionChanged extends FeedEvent {
+  const FeedActionChanged({
+    required this.feedAction,
+  });
+  final FeedAction feedAction;
+
+  @override
+  List<Object> get props => [feedAction];
+}
+
+class FeedActionStatusChanged extends FeedEvent {
+  const FeedActionStatusChanged({
+    required this.feedActionStatus,
+  });
+  final FeedActionStatus feedActionStatus;
+
+  @override
+  List<Object> get props => [feedActionStatus];
+}
+
+class IsFeedPostFeatured extends FeedEvent {
+  const IsFeedPostFeatured({
+    required this.postId,
+  });
+  final int postId;
+
+  @override
+  List<Object> get props => [postId];
+}
+
+class FeedActionReseted extends FeedEvent {}
+
+class IsFeedPostReported extends FeedEvent {
+  const IsFeedPostReported({
+    required this.postId,
+    required this.userId,
+  });
+  final int postId;
+  final String userId;
+
+  @override
+  List<Object> get props => [postId, userId];
+}
+
+class FeedPostReported extends FeedEvent {
+  const FeedPostReported({
+    required this.reportedBy,
+    required this.postId,
+    required this.reason,
+  });
+  final String reportedBy;
+  final int postId;
+  final String reason;
+
+  @override
+  List<Object> get props => [reportedBy, postId, reason];
+}
+
+class FeedPostIgnored extends FeedEvent {
+  const FeedPostIgnored({
+    required this.feedId,
+    required this.index,
+  });
+  final int feedId;
+
+  final int index;
+
+  @override
+  List<Object> get props => [feedId, index];
+}
+
+class FeedPostIgnoreUndoed extends FeedEvent {
+  const FeedPostIgnoreUndoed({
+    required this.index,
+    required this.feed,
+  });
+  final int index;
+  final Feed? feed;
 }

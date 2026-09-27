@@ -1,7 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:injectable/injectable.dart';
 import 'package:legal_referral_ui/src/core/config/config.dart';
-import 'package:legal_referral_ui/src/features/auth/domain/domain.dart';
 import 'package:legal_referral_ui/src/features/feed/data/data.dart';
 import 'package:legal_referral_ui/src/features/feed/domain/domain.dart';
 
@@ -25,46 +24,6 @@ class FeedUsecase {
     );
   }
 
-  Future<Either<Failure, List<AppUser?>>> fetchPostLikedUsers({
-    required int postId,
-  }) async {
-    return _feedRepository.fetchPostLikedUsers(
-      postId: postId,
-    );
-  }
-
-  Future<Either<Failure, Comment?>> commentPost({
-    required CommentReq commentReq,
-  }) async {
-    return _feedRepository.commentPost(
-      commentReq: commentReq,
-    );
-  }
-
-  Future<Either<Failure, List<Comment?>>> fetchPostComments({
-    required int postId,
-  }) async {
-    return _feedRepository.fetchPostComments(
-      postId: postId,
-    );
-  }
-
-  Future<Either<Failure, void>> likeComment({
-    required int commentId,
-  }) async {
-    return _feedRepository.likeComment(
-      commentId: commentId,
-    );
-  }
-
-  Future<Either<Failure, void>> unlikeComment({
-    required int commentId,
-  }) async {
-    return _feedRepository.unlikeComment(
-      commentId: commentId,
-    );
-  }
-
   Future<Either<Failure, PostLikesAndCommentsCount>>
       fetchPostLikesAndCommentsCount({
     required int postId,
@@ -82,19 +41,29 @@ class FeedUsecase {
     );
   }
 
-  Future<Either<Failure, ResponseMsg?>> saveFeaturePost({
-    required SaveFeaturePostReq saveFeaturePostReq,
+  Future<Either<Failure, ResponseMsg?>> featurePost({
+    required FeaturePostReq featurePostReq,
   }) async {
-    return _feedRepository.saveFeaturePost(
-      saveFeaturePostReq: saveFeaturePostReq,
+    return _feedRepository.featurePost(
+      featurePostReq: featurePostReq,
     );
   }
 
-  Future<Either<Failure, ResponseMsg?>> unSaveFeaturePost({
+  Future<Either<Failure, ResponseMsg?>> unFeaturePost({
     required int postId,
+    required UnFeaturePostReq unFeaturePostReq,
   }) async {
-    return _feedRepository.unSaveFeaturePost(
+    return _feedRepository.unFeaturePost(
       postId: postId,
+      unFeaturePostReq: unFeaturePostReq,
+    );
+  }
+
+  Future<Either<Failure, void>> ignoreFeed({
+    required int feedId,
+  }) async {
+    return _feedRepository.ignoreFeed(
+      feeId: feedId,
     );
   }
 }

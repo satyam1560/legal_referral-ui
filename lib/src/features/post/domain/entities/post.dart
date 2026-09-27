@@ -21,20 +21,23 @@ enum PostType {
 }
 
 @freezed
-class Post with _$Post {
+sealed class Post with _$Post {
   const factory Post({
     @JsonKey(name: 'owner_id') required String ownerId,
-    @JsonKey(name: 'post_type') required PostType type,
+    @JsonKey(name: 'post_type') required PostType postType,
     @JsonKey(name: 'created_at', includeToJson: false)
     @DateTimeJsonConverter()
     required DateTime createdAt,
     @JsonKey(name: 'post_id') required int postId,
+    @Default(0) @JsonKey(name: 'likes_count') int likesCount,
+    @Default(0) @JsonKey(name: 'comments_count') int commentsCount,
+    @JsonKey(name: 'is_liked') bool? isLiked,
     @JsonKey(name: 'owner_first_name') String? ownerFirstName,
     @JsonKey(name: 'owner_last_name') String? ownerLastName,
     @JsonKey(name: 'owner_avatar_url') String? ownerAvatarUrl,
     @JsonKey(name: 'owner_practice_area') String? ownerPracticeArea,
     String? content,
-    @JsonKey(name: 'media') @Default([]) List<String?> filesUrls,
+    @JsonKey(name: 'media') @Default([]) List<String> media,
     @JsonKey(name: 'poll_id', includeIfNull: false) int? pollId,
   }) = _Post;
 

@@ -2,24 +2,48 @@ part of 'feed_bloc.dart';
 
 enum FeedStatus { initial, loading, success, failure }
 
-enum FeedActionsStatus { initial, loading, success, failure }
+enum FeedAction {
+  initial,
+  edit,
+  delete,
+  save,
+  unsave,
+  like,
+  unlike,
+  comment,
+  reply,
+  report,
+  block,
+  featured,
+  unfeatured,
+  ignore,
+  ignoreUndo,
+}
+
+enum FeedActionStatus { initial, loading, success, failure }
 
 class FeedState extends Equatable {
   const FeedState({
-    required this.feedActionsStatus,
+    required this.feedAction,
     required this.status,
     required this.feeds,
+    this.feedActionStatus,
     this.offset = 1,
     this.hasReachedMax = false,
     this.postLikedUsers = const [],
     this.comments = const [],
     this.feed,
+    this.isPostFeatured = false,
     this.parentCommentId,
+    this.ignoredFeed,
+    this.ignoredFeedIndex,
+    this.isPostReported = false,
     this.failure,
   });
 
   factory FeedState.initial() => const FeedState(
-        feedActionsStatus: FeedActionsStatus.initial,
+        feedAction: FeedAction.initial,
+        feedActionStatus: FeedActionStatus.initial,
         status: FeedStatus.initial,
         feeds: [],
       );
@@ -31,32 +55,47 @@ class FeedState extends Equatable {
   final List<Comment?> comments;
   final Feed? feed;
   final int? parentCommentId;
-  final FeedActionsStatus feedActionsStatus;
+  final bool isPostFeatured;
+  final FeedAction feedAction;
+  final FeedActionStatus? feedActionStatus;
+  final bool isPostReported;
+  final Feed? ignoredFeed;
+  final int? ignoredFeedIndex;
   final FeedStatus status;
   final Failure? failure;
 
   FeedState copyWith({
-    FeedActionsStatus? feedActionsStatus,
+    FeedAction? feedAction,
+    FeedActionStatus? feedActionStatus,
     FeedStatus? status,
     int? offset,
     List<Feed?>? feeds,
     bool? hasReachedMax,
     List<AppUser?>? postLikedUsers,
     List<Comment?>? comments,
+    bool? isPostFeatured,
     Feed? feed,
+    Feed? ignoredFeed,
+    int? ignoredFeedIndex,
     int? parentCommentId,
+    bool? isPostReported,
     Failure? failure,
   }) {
     return FeedState(
-      feedActionsStatus: feedActionsStatus ?? this.feedActionsStatus,
+      feedAction: feedAction ?? this.feedAction,
+      feedActionStatus: feedActionStatus ?? this.feedActionStatus,
       status: status ?? this.status,
       offset: offset ?? this.offset,
       feeds: feeds ?? this.feeds,
       hasReachedMax: hasReachedMax ?? this.hasReachedMax,
       postLikedUsers: postLikedUsers ?? this.postLikedUsers,
       comments: comments ?? this.comments,
+      isPostFeatured: isPostFeatured ?? this.isPostFeatured,
       feed: feed ?? this.feed,
+      ignoredFeed: ignoredFeed ?? this.ignoredFeed,
+      ignoredFeedIndex: ignoredFeedIndex ?? this.ignoredFeedIndex,
       parentCommentId: parentCommentId,
+      isPostReported: isPostReported ?? this.isPostReported,
       failure: failure ?? this.failure,
     );
   }
@@ -66,15 +105,20 @@ class FeedState extends Equatable {
 
   @override
   List<Object?> get props => [
-        feedActionsStatus,
+        feedAction,
+        feedActionStatus,
         status,
         offset,
         feeds,
         hasReachedMax,
         postLikedUsers,
         comments,
+        isPostFeatured,
         feed,
         parentCommentId,
+        ignoredFeed,
+        ignoredFeedIndex,
+        isPostReported,
         failure,
       ];
 }

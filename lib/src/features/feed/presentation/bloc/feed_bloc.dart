@@ -44,18 +44,27 @@ class FeedBloc extends Bloc<FeedEvent, FeedState> {
     on<FeedRefreshed>(_onFeedRefreshed);
     on<FeedPostLiked>(_onFeedPostLiked);
     on<FeedPostUnliked>(_onFeedPostUnliked);
-    on<PostLikedUsersFetched>(_onPostLikedUsersFetched);
-    on<Commented>(_onCommented);
-    on<CommentsFetched>(_onCommentsFetched);
-    on<CommentLiked>(_onCommentLiked);
-    on<CommentUnliked>(_onCommentUnliked);
+    on<FeedPostLikedUsersFetched>(_onFeedPostLikedUsersFetched);
+    on<FeedPostCommented>(_onFeedPostCommented);
+    on<FeedPostCommentsFetched>(_onFeedPostCommentsFetched);
+    on<FeedPostCommentLiked>(_onFeedPostCommentLiked);
+    on<FeedPostCommentUnliked>(_onFeedPostCommentUnliked);
     on<FeedDetailsInitialized>(_onFeedDetailsInitialized);
-    on<ParentCommentIdChanged>(_onParentCommentIdChanged);
+    on<FeedPostParentCommentIdChanged>(_onFeedPostParentCommentIdChanged);
     on<PostLikesAndCommentsCountFetched>(_onPostLikesAndCommentsCountFetched);
     on<PostIsLikedFetched>(_onIsLikedPostFetched);
     on<PostSaved>(_onPostSaved);
-    on<FeaturePostSaved>(_onFeaturePostSaved);
+    on<FeedPostFeatured>(_onFeedPostFeatured);
+    on<FeedPostUnFeatured>(_onFeedPostUnFeatured);
     on<PostDeleted>(_onPostDeleted);
+    on<FeedActionChanged>(_onFeedActionChanged);
+    on<FeedActionStatusChanged>(_onFeedActionStatusChanged);
+    on<FeedActionReseted>(_onFeedActionReseted);
+    on<IsFeedPostFeatured>(_onIsFeedPostFeatured);
+    on<IsFeedPostReported>(_onIsFeedPostReported);
+    on<FeedPostReported>(_onFeedPostReported);
+    on<FeedPostIgnored>(_onFeedPostIgnored);
+    on<FeedPostIgnoreUndoed>(_onFeedPostIgnoreUndoed);
   }
 
   final FeedUsecase _feedUsecase;
@@ -149,14 +158,14 @@ class FeedBloc extends Bloc<FeedEvent, FeedState> {
     final feeds = List.of(state.feeds);
 
     if (feed != null) {
-      final feedPost = feed.feedPost;
-      final isCurrentlyLiked = feedPost?.isLiked ?? false;
+      final post = feed.post;
+      final isCurrentlyLiked = post?.isLiked ?? false;
       final updatedLikesCount = isCurrentlyLiked
-          ? (feedPost?.likesCount ?? 0) - 1
-          : (feedPost?.likesCount ?? 0) + 1;
+          ? (post?.likesCount ?? 0) - 1
+          : (post?.likesCount ?? 0) + 1;
 
       final updatedFeed = feed.copyWith(
-        feedPost: feedPost?.copyWith(
+        post: post?.copyWith(
           likesCount: updatedLikesCount,
           isLiked: !isCurrentlyLiked,
         ),
@@ -179,8 +188,8 @@ class FeedBloc extends Bloc<FeedEvent, FeedState> {
       );
 
       final likePostReq = LikePostReq(
-        userId: event.userId,
-        senderId: event.senderId,
+        postOwnerId: event.postOwnerId,
+        currentUserId: event.currentUserId,
         postId: event.postId,
       );
 
@@ -189,11 +198,11 @@ class FeedBloc extends Bloc<FeedEvent, FeedState> {
       // Revert the change if the API call fails
       if (response.isLeft()) {
         final revertedLikesCount = !isCurrentlyLiked
-            ? (feedPost?.likesCount ?? 0) - 1
-            : (feedPost?.likesCount ?? 0) + 1;
+            ? (post?.likesCount ?? 0) - 1
+            : (post?.likesCount ?? 0) + 1;
 
         final revertedFeed = feed.copyWith(
-          feedPost: feedPost?.copyWith(
+          post: post?.copyWith(
             likesCount: revertedLikesCount,
             isLiked: isCurrentlyLiked,
           ),
@@ -228,15 +237,15 @@ class FeedBloc extends Bloc<FeedEvent, FeedState> {
     final feeds = List.of(state.feeds);
 
     if (feed != null) {
-      final feedPost = feed.feedPost;
-      final isCurrentlyLiked = feedPost?.isLiked ?? false;
+      final post = feed.post;
+      final isCurrentlyLiked = post?.isLiked ?? false;
       final updatedLikesCount = isCurrentlyLiked
-          ? (feedPost?.likesCount ?? 0) - 1
-          : (feedPost?.likesCount ?? 0) + 1;
+          ? (post?.likesCount ?? 0) - 1
+          : (post?.likesCount ?? 0) + 1;
 
       // Create an updated feed with the new like state (unlike action)
       final updatedFeed = feed.copyWith(
-        feedPost: feedPost?.copyWith(
+        post: post?.copyWith(
           likesCount: updatedLikesCount,
           isLiked: !isCurrentlyLiked,
         ),
@@ -266,11 +275,11 @@ class FeedBloc extends Bloc<FeedEvent, FeedState> {
       // Revert the change if the API call fails
       if (response.isLeft()) {
         final revertedLikesCount = !isCurrentlyLiked
-            ? (feedPost?.likesCount ?? 0) - 1
-            : (feedPost?.likesCount ?? 0) + 1;
+            ? (post?.likesCount ?? 0) - 1
+            : (post?.likesCount ?? 0) + 1;
 
         final revertedFeed = feed.copyWith(
-          feedPost: feedPost?.copyWith(
+          post: post?.copyWith(
             likesCount: revertedLikesCount,
             isLiked: isCurrentlyLiked,
           ),
@@ -295,8 +304,8 @@ class FeedBloc extends Bloc<FeedEvent, FeedState> {
     }
   }
 
-  Future<void> _onPostLikedUsersFetched(
-    PostLikedUsersFetched event,
+  Future<void> _onFeedPostLikedUsersFetched(
+    FeedPostLikedUsersFetched event,
     Emitter<FeedState> emit,
   ) async {
     emit(
@@ -305,7 +314,7 @@ class FeedBloc extends Bloc<FeedEvent, FeedState> {
       ),
     );
 
-    final response = await _feedUsecase.fetchPostLikedUsers(
+    final response = await _postUsecase.fetchPostLikedUsers(
       postId: event.postId,
     );
 
@@ -329,11 +338,11 @@ class FeedBloc extends Bloc<FeedEvent, FeedState> {
     );
   }
 
-  Future<void> _onCommented(
-    Commented event,
+  Future<void> _onFeedPostCommented(
+    FeedPostCommented event,
     Emitter<FeedState> emit,
   ) async {
-    final response = await _feedUsecase.commentPost(
+    final response = await _postUsecase.commentPost(
       commentReq: event.comment,
     );
 
@@ -353,8 +362,8 @@ class FeedBloc extends Bloc<FeedEvent, FeedState> {
         if (index >= 0 && index < feeds.length) {
           final feed = feeds[index];
           updatedFeed = feed?.copyWith(
-            feedPost: feed.feedPost?.copyWith(
-              commentsCount: feed.feedPost!.commentsCount + 1,
+            post: feed.post?.copyWith(
+              commentsCount: feed.post?.commentsCount ?? 0 + 1,
             ),
           );
           feeds[index] = updatedFeed;
@@ -381,8 +390,8 @@ class FeedBloc extends Bloc<FeedEvent, FeedState> {
     );
   }
 
-  Future<void> _onCommentsFetched(
-    CommentsFetched event,
+  Future<void> _onFeedPostCommentsFetched(
+    FeedPostCommentsFetched event,
     Emitter<FeedState> emit,
   ) async {
     emit(
@@ -391,7 +400,7 @@ class FeedBloc extends Bloc<FeedEvent, FeedState> {
       ),
     );
 
-    final response = await _feedUsecase.fetchPostComments(
+    final response = await _postUsecase.fetchPostComments(
       postId: event.postId,
     );
 
@@ -415,11 +424,11 @@ class FeedBloc extends Bloc<FeedEvent, FeedState> {
     );
   }
 
-  Future<void> _onCommentLiked(
-    CommentLiked event,
+  Future<void> _onFeedPostCommentLiked(
+    FeedPostCommentLiked event,
     Emitter<FeedState> emit,
   ) async {
-    final response = await _feedUsecase.likeComment(
+    final response = await _postUsecase.likeComment(
       commentId: event.commentId,
     );
 
@@ -454,11 +463,11 @@ class FeedBloc extends Bloc<FeedEvent, FeedState> {
     );
   }
 
-  Future<void> _onCommentUnliked(
-    CommentUnliked event,
+  Future<void> _onFeedPostCommentUnliked(
+    FeedPostCommentUnliked event,
     Emitter<FeedState> emit,
   ) async {
-    final response = await _feedUsecase.unlikeComment(
+    final response = await _postUsecase.unlikeComment(
       commentId: event.commentId,
     );
 
@@ -504,8 +513,8 @@ class FeedBloc extends Bloc<FeedEvent, FeedState> {
     );
   }
 
-  void _onParentCommentIdChanged(
-    ParentCommentIdChanged event,
+  void _onFeedPostParentCommentIdChanged(
+    FeedPostParentCommentIdChanged event,
     Emitter<FeedState> emit,
   ) {
     emit(
@@ -543,7 +552,7 @@ class FeedBloc extends Bloc<FeedEvent, FeedState> {
           state.copyWith(
             status: FeedStatus.success,
             feed: state.feed?.copyWith(
-              feedPost: state.feed?.feedPost?.copyWith(
+              post: state.feed?.post?.copyWith(
                 likesCount: res.likes,
                 commentsCount: res.comments,
               ),
@@ -576,7 +585,7 @@ class FeedBloc extends Bloc<FeedEvent, FeedState> {
           state.copyWith(
             status: FeedStatus.success,
             feed: state.feed?.copyWith(
-              feedPost: state.feed?.feedPost?.copyWith(
+              post: state.feed?.post?.copyWith(
                 isLiked: isLiked,
               ),
             ),
@@ -599,7 +608,8 @@ class FeedBloc extends Bloc<FeedEvent, FeedState> {
       (failure) {
         emit(
           state.copyWith(
-            feedActionsStatus: FeedActionsStatus.failure,
+            feedAction: FeedAction.save,
+            feedActionStatus: FeedActionStatus.failure,
             failure: failure,
           ),
         );
@@ -607,31 +617,33 @@ class FeedBloc extends Bloc<FeedEvent, FeedState> {
       (_) {
         emit(
           state.copyWith(
-            feedActionsStatus: FeedActionsStatus.success,
+            feedAction: FeedAction.save,
+            feedActionStatus: FeedActionStatus.success,
           ),
         );
       },
     );
   }
 
-  Future<void> _onFeaturePostSaved(
-    FeaturePostSaved event,
+  Future<void> _onFeedPostFeatured(
+    FeedPostFeatured event,
     Emitter<FeedState> emit,
   ) async {
-    final saveFeaturePostReq = SaveFeaturePostReq(
+    final featurePostReq = FeaturePostReq(
       userId: event.userId,
       postId: event.postId,
     );
 
-    final response = await _feedUsecase.saveFeaturePost(
-      saveFeaturePostReq: saveFeaturePostReq,
+    final response = await _feedUsecase.featurePost(
+      featurePostReq: featurePostReq,
     );
 
     response.fold(
       (failure) {
         emit(
           state.copyWith(
-            feedActionsStatus: FeedActionsStatus.failure,
+            feedAction: FeedAction.featured,
+            feedActionStatus: FeedActionStatus.failure,
             failure: failure,
           ),
         );
@@ -639,7 +651,43 @@ class FeedBloc extends Bloc<FeedEvent, FeedState> {
       (_) {
         emit(
           state.copyWith(
-            feedActionsStatus: FeedActionsStatus.success,
+            isPostFeatured: true,
+            feedAction: FeedAction.featured,
+            feedActionStatus: FeedActionStatus.success,
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _onFeedPostUnFeatured(
+    FeedPostUnFeatured event,
+    Emitter<FeedState> emit,
+  ) async {
+    final response = await _feedUsecase.unFeaturePost(
+      postId: event.postId,
+      unFeaturePostReq: UnFeaturePostReq(
+        userId: event.userId,
+        postId: event.postId,
+      ),
+    );
+
+    response.fold(
+      (failure) {
+        emit(
+          state.copyWith(
+            feedAction: FeedAction.unfeatured,
+            feedActionStatus: FeedActionStatus.failure,
+            failure: failure,
+          ),
+        );
+      },
+      (_) {
+        emit(
+          state.copyWith(
+            isPostFeatured: false,
+            feedAction: FeedAction.unfeatured,
+            feedActionStatus: FeedActionStatus.success,
           ),
         );
       },
@@ -658,24 +706,225 @@ class FeedBloc extends Bloc<FeedEvent, FeedState> {
       (failure) {
         emit(
           state.copyWith(
-            feedActionsStatus: FeedActionsStatus.failure,
             failure: failure,
+            feedAction: FeedAction.delete,
+            feedActionStatus: FeedActionStatus.failure,
           ),
         );
       },
       (_) {
         final feeds = List.of(state.feeds);
         feeds.removeWhere(
-          (feed) => feed?.feedPost?.postId == event.postId,
+          (feed) => feed?.post?.postId == event.postId,
         );
 
         emit(
           state.copyWith(
-            feedActionsStatus: FeedActionsStatus.success,
             feeds: feeds,
+            feedAction: FeedAction.delete,
+            feedActionStatus: FeedActionStatus.success,
           ),
         );
       },
+    );
+  }
+
+  void _onFeedActionChanged(
+    FeedActionChanged event,
+    Emitter<FeedState> emit,
+  ) {
+    emit(
+      state.copyWith(
+        feedAction: event.feedAction,
+      ),
+    );
+  }
+
+  void _onFeedActionStatusChanged(
+    FeedActionStatusChanged event,
+    Emitter<FeedState> emit,
+  ) {
+    emit(
+      state.copyWith(
+        feedActionStatus: event.feedActionStatus,
+      ),
+    );
+  }
+
+  void _onFeedActionReseted(
+    FeedActionReseted event,
+    Emitter<FeedState> emit,
+  ) {
+    emit(
+      state.copyWith(
+        feedAction: FeedAction.initial,
+        feedActionStatus: FeedActionStatus.initial,
+      ),
+    );
+  }
+
+  Future<void> _onIsFeedPostFeatured(
+    IsFeedPostFeatured event,
+    Emitter<FeedState> emit,
+  ) async {
+    emit(
+      state.copyWith(
+        feedActionStatus: FeedActionStatus.loading,
+      ),
+    );
+
+    final response = await _postUsecase.isPostFeatured(
+      postId: event.postId,
+    );
+
+    response.fold(
+      (failure) {
+        emit(
+          state.copyWith(
+            status: FeedStatus.failure,
+            failure: failure,
+          ),
+        );
+      },
+      (isPostFeatured) {
+        emit(
+          state.copyWith(
+            status: FeedStatus.success,
+            isPostFeatured: isPostFeatured,
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _onIsFeedPostReported(
+    IsFeedPostReported event,
+    Emitter<FeedState> emit,
+  ) async {
+    emit(
+      state.copyWith(
+        feedActionStatus: FeedActionStatus.loading,
+      ),
+    );
+
+    final response = await _postUsecase.isPostReported(
+      postId: event.postId,
+      userId: event.userId,
+    );
+
+    response.fold(
+      (failure) {
+        emit(
+          state.copyWith(
+            status: FeedStatus.failure,
+            failure: failure,
+          ),
+        );
+      },
+      (isPostReported) {
+        emit(
+          state.copyWith(
+            status: FeedStatus.success,
+            isPostReported: isPostReported,
+            feedActionStatus: FeedActionStatus.success,
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _onFeedPostReported(
+    FeedPostReported event,
+    Emitter<FeedState> emit,
+  ) async {
+    final response = await _postUsecase.reportPost(
+      reportPostReq: ReportPostReq(
+        reportedBy: event.reportedBy,
+        postId: event.postId,
+        reason: event.reason,
+      ),
+    );
+    response.fold(
+      (failure) {
+        emit(
+          state.copyWith(
+            feedAction: FeedAction.report,
+            feedActionStatus: FeedActionStatus.failure,
+            failure: failure,
+          ),
+        );
+      },
+      (_) {
+        emit(
+          state.copyWith(
+            feedAction: FeedAction.report,
+            feedActionStatus: FeedActionStatus.success,
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _onFeedPostIgnored(
+    FeedPostIgnored event,
+    Emitter<FeedState> emit,
+  ) async {
+    final feeds = List.of(state.feeds);
+    final feed = feeds[event.index];
+    feeds.removeAt(event.index);
+    emit(
+      state.copyWith(
+        feedAction: FeedAction.ignore,
+        feeds: feeds,
+        ignoredFeed: feed,
+        ignoredFeedIndex: event.index,
+      ),
+    );
+    await Future.delayed(
+      const Duration(seconds: 5),
+      () async {
+        if (state.feedAction == FeedAction.ignore) {
+          final response = await _feedUsecase.ignoreFeed(
+            feedId: event.feedId,
+          );
+          response.fold(
+            (failure) {
+              final feeds = List.of(state.feeds);
+              feeds.insert(event.index, state.ignoredFeed);
+              emit(
+                state.copyWith(
+                  feeds: feeds,
+                  feedAction: FeedAction.ignore,
+                  feedActionStatus: FeedActionStatus.failure,
+                ),
+              );
+            },
+            (_) {
+              emit(
+                state.copyWith(
+                  feedAction: FeedAction.initial,
+                  feedActionStatus: FeedActionStatus.initial,
+                ),
+              );
+            },
+          );
+        }
+      },
+    );
+  }
+
+  void _onFeedPostIgnoreUndoed(
+    FeedPostIgnoreUndoed event,
+    Emitter<FeedState> emit,
+  ) {
+    final feeds = List.of(state.feeds);
+    feeds.insert(event.index, event.feed);
+    emit(
+      state.copyWith(
+        feeds: feeds,
+        feedAction: FeedAction.initial,
+        feedActionStatus: FeedActionStatus.initial,
+      ),
     );
   }
 }

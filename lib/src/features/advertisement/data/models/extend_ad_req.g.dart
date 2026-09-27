@@ -7,10 +7,9 @@ part of 'extend_ad_req.dart';
 // **************************************************************************
 
 ExtendAdReq _$ExtendAdReqFromJson(Map<String, dynamic> json) => ExtendAdReq(
-      adId: (json['ad_id'] as num).toInt(),
-      endDate:
-          const DateTimeJsonConverter().fromJson(json['end_date'] as String),
-    );
+  adId: (json['ad_id'] as num).toInt(),
+  endDate: const DateTimeJsonConverter().fromJson(json['end_date'] as String),
+);
 
 Map<String, dynamic> _$ExtendAdReqToJson(ExtendAdReq instance) =>
     <String, dynamic>{

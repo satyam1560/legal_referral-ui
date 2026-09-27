@@ -37,7 +37,7 @@ class LocalNotificationUtil {
     final notificationAppLaunchDetails = !kIsWeb && Platform.isLinux
         ? null
         : await flutterLocalNotificationsPlugin
-            .getNotificationAppLaunchDetails();
+              .getNotificationAppLaunchDetails();
 
     // var initialRoute = '/';
     if (notificationAppLaunchDetails?.didNotificationLaunchApp ?? false) {
@@ -46,8 +46,10 @@ class LocalNotificationUtil {
       // initialRoute = '/post-details';
     }
 
-    const initializationSettingsAndroid =
-        AndroidInitializationSettings('app_icon');
+    const initializationSettingsAndroid = AndroidInitializationSettings(
+      // 'app_icon',
+      '@mipmap/ic_launcher'
+    );
 
     final darwinNotificationCategories = <DarwinNotificationCategory>[
       DarwinNotificationCategory(
@@ -99,17 +101,17 @@ class LocalNotificationUtil {
       requestAlertPermission: false,
       requestBadgePermission: false,
       requestSoundPermission: false,
-      onDidReceiveLocalNotification:
-          (int id, String? title, String? body, String? payload) async {
-        // didReceiveLocalNotificationStream.add(
-        //   ReceivedNotification(
-        //     id: id,
-        //     title: title,
-        //     body: body,
-        //     payload: payload,
-        //   ),
-        // );
-      },
+      // onDidReceiveLocalNotification:
+      //     (int id, String? title, String? body, String? payload) async {
+      // didReceiveLocalNotificationStream.add(
+      //   ReceivedNotification(
+      //     id: id,
+      //     title: title,
+      //     body: body,
+      //     payload: payload,
+      //   ),
+      // );
+      // },
       notificationCategories: darwinNotificationCategories,
     );
     final initializationSettingsLinux = LinuxInitializationSettings(
@@ -123,26 +125,28 @@ class LocalNotificationUtil {
       linux: initializationSettingsLinux,
     );
     await flutterLocalNotificationsPlugin.initialize(
-      initializationSettings,
+      settings: initializationSettings,
       onDidReceiveNotificationResponse:
           (NotificationResponse notificationResponse) {
-        debugPrint('onDidReceiveNotificationResponse $notificationResponse');
+            debugPrint(
+              'onDidReceiveNotificationResponse $notificationResponse',
+            );
 
-        final notification = notificationResponse.payload;
+            final notification = notificationResponse.payload;
 
-        debugPrint('notification payload $notification');
+            debugPrint('notification payload $notification');
 
-        // switch (notificationResponse.notificationResponseType) {
-        // case NotificationResponseType.selectedNotification:
-        //   selectNotificationStream.add(notificationResponse.payload);
-        //   break;
-        // case NotificationResponseType.selectedNotificationAction:
-        //   if (notificationResponse.actionId == navigationActionId) {
-        //     selectNotificationStream.add(notificationResponse.payload);
-        //   }
-        //   break;
-        // }
-      },
+            // switch (notificationResponse.notificationResponseType) {
+            // case NotificationResponseType.selectedNotification:
+            //   selectNotificationStream.add(notificationResponse.payload);
+            //   break;
+            // case NotificationResponseType.selectedNotificationAction:
+            //   if (notificationResponse.actionId == navigationActionId) {
+            //     selectNotificationStream.add(notificationResponse.payload);
+            //   }
+            //   break;
+            // }
+          },
       onDidReceiveBackgroundNotificationResponse: notificationTapBackground,
     );
   }
@@ -154,11 +158,10 @@ class LocalNotificationUtil {
     final android = message.notification?.android;
     if (notification != null && android != null && !kIsWeb) {
       flutterLocalNotificationsPlugin.show(
-        notification.hashCode,
-        notification.title ?? '',
-        notification.body ?? '',
-        payload: jsonEncode(message.data),
-        const NotificationDetails(
+        id: notification.hashCode,
+        title: notification.title ?? '',
+        body: notification.body ?? '',
+        notificationDetails: const NotificationDetails(
           android: AndroidNotificationDetails(
             'high_importance_channel',
             'High Importance Notifications',
@@ -168,6 +171,7 @@ class LocalNotificationUtil {
             icon: 'app_icon',
           ),
         ),
+        payload: jsonEncode(message.data),
       );
     }
   }
@@ -178,8 +182,10 @@ class LocalNotificationUtil {
     Future<void> Function(String? value) onPressed,
   ) async {
     if (!UniversalPlatform.isWeb) {
-      const initializationSettingsAndroid =
-          AndroidInitializationSettings('app_icon');
+      const initializationSettingsAndroid = AndroidInitializationSettings(
+        // 'app_icon',
+        '@mipmap/ic_launcher'
+      );
 
       const initializationSettingsIOS = DarwinInitializationSettings();
 
@@ -189,7 +195,7 @@ class LocalNotificationUtil {
       );
 
       await flutterLocalNotificationsPlugin.initialize(
-        initializationSettings,
+       settings: initializationSettings,
         onDidReceiveBackgroundNotificationResponse: (value) {},
         onDidReceiveNotificationResponse: (value) {},
       );
@@ -210,16 +216,13 @@ class LocalNotificationUtil {
         importance: Importance.max,
       );
       const iOS = DarwinNotificationDetails();
-      const platform = NotificationDetails(
-        android: android,
-        iOS: iOS,
-      );
+      const platform = NotificationDetails(android: android, iOS: iOS);
 
       await flutterLocalNotificationsPlugin.show(
-        id,
-        title ?? 'Hello',
-        body ?? 'You may have new notifications',
-        platform,
+        id: id,
+        title: title ?? 'Hello',
+        body: body ?? 'You may have new notifications',
+        notificationDetails: platform,
         payload: payload,
       );
     } catch (error) {
@@ -228,6 +231,6 @@ class LocalNotificationUtil {
   }
 
   Future<void> cancelNotification(int id) async {
-    await flutterLocalNotificationsPlugin.cancel(id);
+    await flutterLocalNotificationsPlugin.cancel(id: id);
   }
 }

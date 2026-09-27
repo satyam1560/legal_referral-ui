@@ -8,10 +8,7 @@ import 'package:legal_referral_ui/src/features/firm/presentation/presentation.da
 import 'package:legal_referral_ui/src/features/profile/domain/domain.dart';
 
 class FirmSocialMedias extends StatefulWidget {
-  const FirmSocialMedias({
-    required this.firmBloc,
-    super.key,
-  });
+  const FirmSocialMedias({required this.firmBloc, super.key});
 
   final FirmBloc firmBloc;
 
@@ -30,10 +27,7 @@ class _FirmSocialMediasState extends State<FirmSocialMedias> {
           physics: const NeverScrollableScrollPhysics(),
           itemCount: state.socialMedias.length,
           itemBuilder: (context, index) {
-            return SocialMediaField(
-              firmBloc: widget.firmBloc,
-              index: index,
-            );
+            return SocialMediaField(firmBloc: widget.firmBloc, index: index);
           },
         );
       },
@@ -56,21 +50,36 @@ class SocialMediaField extends StatefulWidget {
 }
 
 class _SocialMediaFieldState extends State<SocialMediaField> {
-  final _platformController = TextEditingController();
+  // final _platformController = TextEditingController();
+  late final ValueNotifier<String?> _platformNotifier;
   final _linkController = TextEditingController();
+  @override
+  void initState() {
+    super.initState();
+    _platformNotifier = ValueNotifier(null);
+  }
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        const SizedBox(
-          height: 16,
-        ),
+        const SizedBox(height: 16),
         CustomDropDown(
           items: SocialMediaConstants.socialMediaList,
+          // onChange: (value) {
+          //   if (value != null) {
+          //     _platformController.text = value;
+          //     widget.firmBloc.add(
+          //       SocialMediaPlatformSelected(
+          //         platform: _getSocialPlatform(value),
+          //         index: widget.index,
+          //       ),
+          //     );
+          //   }
+          // },
           onChange: (value) {
             if (value != null) {
-              _platformController.text = value;
+              _platformNotifier.value = value;
               widget.firmBloc.add(
                 SocialMediaPlatformSelected(
                   platform: _getSocialPlatform(value),
@@ -79,9 +88,7 @@ class _SocialMediaFieldState extends State<SocialMediaField> {
               );
             }
           },
-          selectedValue: _platformController.text.isEmpty
-              ? null
-              : _platformController.text,
+          selectedValueNotifier: _platformNotifier,
           hintText: 'Select social media',
           labelText: 'Social Media',
           validator: (value) {
@@ -92,24 +99,22 @@ class _SocialMediaFieldState extends State<SocialMediaField> {
           },
         ),
         SizedBox(height: 16.h),
-        CustomTextField(
-          controller: _linkController,
-          hintText: _hintText(
-            _getSocialPlatform(
-              _platformController.text,
-            ),
-          ),
-          labelText: 'Link',
-          validator: Validator.validateURL,
-          onChanged: (value) {
-            if (value != null && value.isNotEmpty) {
-              widget.firmBloc.add(
-                SocialLinkChanged(
-                  url: value,
-                  index: widget.index,
-                ),
-              );
-            }
+        ValueListenableBuilder<String?>(
+          valueListenable: _platformNotifier,
+          builder: (context, platform, _) {
+            return CustomTextField(
+              controller: _linkController,
+              hintText: _hintText(_getSocialPlatform(platform ?? '')),
+              labelText: 'Link',
+              validator: Validator.validateURL,
+              onChanged: (value) {
+                if (value != null && value.isNotEmpty) {
+                  widget.firmBloc.add(
+                    SocialLinkChanged(url: value, index: widget.index),
+                  );
+                }
+              },
+            );
           },
         ),
         SizedBox(height: 16.h),
@@ -151,7 +156,7 @@ class _SocialMediaFieldState extends State<SocialMediaField> {
 
   @override
   void dispose() {
-    _platformController.dispose();
+    _platformNotifier.dispose();
     _linkController.dispose();
     super.dispose();
   }

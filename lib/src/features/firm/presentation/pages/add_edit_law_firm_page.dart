@@ -15,19 +15,13 @@ import 'package:legal_referral_ui/src/features/firm/presentation/presentation.da
 import 'package:toastification/toastification.dart';
 
 class AddEditLawFirmPageArgs {
-  AddEditLawFirmPageArgs({
-    required this.firmBloc,
-    this.firm,
-  });
+  AddEditLawFirmPageArgs({required this.firmBloc, this.firm});
   final FirmBloc firmBloc;
   final Firm? firm;
 }
 
 class AddEditLawFirmPage extends StatefulWidget {
-  const AddEditLawFirmPage({
-    required this.args,
-    super.key,
-  });
+  const AddEditLawFirmPage({required this.args, super.key});
 
   final AddEditLawFirmPageArgs args;
 
@@ -44,26 +38,31 @@ class _AddEditLawFirmPageState extends State<AddEditLawFirmPage> {
 
   final _nameController = TextEditingController();
   final _websiteController = TextEditingController();
-  final _orgTypeController = TextEditingController();
+  // final _orgTypeController = TextEditingController();
   final _locationController = TextEditingController();
   final _aboutController = TextEditingController();
-
+  late final ValueNotifier<String?> _orgTypeNotifier;
   @override
   void initState() {
     _nameController.text = widget.args.firm?.name ?? '';
     _websiteController.text = widget.args.firm?.website ?? '';
-    _orgTypeController.text = widget.args.firm?.orgType ?? '';
+  final orgType = widget.args.firm?.orgType;
+_orgTypeNotifier = ValueNotifier(orgType?.isEmpty ?? true ? null : orgType);
     _locationController.text = widget.args.firm?.location ?? '';
     _aboutController.text = widget.args.firm?.about ?? '';
     super.initState();
   }
 
   @override
+  void dispose() {
+    _orgTypeNotifier.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Create a Firm Page'),
-      ),
+      appBar: AppBar(title: const Text('Create a Firm Page')),
       body: BlocConsumer<FirmBloc, FirmState>(
         bloc: _firmBloc,
         listener: (context, state) {
@@ -110,9 +109,7 @@ class _AddEditLawFirmPageState extends State<AddEditLawFirmPage> {
                     ),
                     const SizedBox(height: 16),
                     UploadFileContainer(
-                      onTap: () => _firmBloc.add(
-                        FirmLogoFileSelected(),
-                      ),
+                      onTap: () => _firmBloc.add(FirmLogoFileSelected()),
                       hintText: 'Choose file(.png, .jpeg, jpg)\n2 MB max',
                     ),
                     if (state.pickedFile != null)
@@ -128,15 +125,14 @@ class _AddEditLawFirmPageState extends State<AddEditLawFirmPage> {
                               color: LegalReferralColors.textGrey500,
                             ),
                           ),
-                          if (state.pickedFile != null)
-                            SizedBox(
-                              height: 12.h,
-                            ),
+                          if (state.pickedFile != null) SizedBox(height: 12.h),
                           if (state.pickedFile != null)
                             Container(
                               color: LegalReferralColors.containerWhite500,
-                              height: ImageUtil.getFileName(state.pickedFile)
-                                          .length >
+                              height:
+                                  ImageUtil.getFileName(
+                                        state.pickedFile,
+                                      ).length >
                                       50
                                   ? 120.h
                                   : 70.h,
@@ -145,17 +141,11 @@ class _AddEditLawFirmPageState extends State<AddEditLawFirmPage> {
                                 padding: EdgeInsets.symmetric(horizontal: 8.w),
                                 child: Row(
                                   children: [
-                                    SvgPicture.asset(
-                                      IconStringConstants.file,
-                                    ),
-                                    SizedBox(
-                                      width: 8.w,
-                                    ),
+                                    SvgPicture.asset(IconStringConstants.file),
+                                    SizedBox(width: 8.w),
                                     Expanded(
                                       child: Text(
-                                        ImageUtil.getFileName(
-                                          state.pickedFile,
-                                        ),
+                                        ImageUtil.getFileName(state.pickedFile),
                                         style: TextStyle(
                                           fontSize: 14.h,
                                           fontWeight: FontWeight.w400,
@@ -186,11 +176,9 @@ class _AddEditLawFirmPageState extends State<AddEditLawFirmPage> {
                     CustomDropDown(
                       items: PracticeAreaConstants.allPracticeAreas,
                       onChange: (value) {
-                        _orgTypeController.text = value ?? '';
+                        _orgTypeNotifier.value = value ?? '';
                       },
-                      selectedValue: _orgTypeController.text.isEmpty
-                          ? null
-                          : _orgTypeController.text,
+                      selectedValueNotifier: _orgTypeNotifier,
                       hintText: 'Select type',
                       labelText: 'Organization Type',
                       validator: (value) {
@@ -200,9 +188,7 @@ class _AddEditLawFirmPageState extends State<AddEditLawFirmPage> {
                         return null;
                       },
                     ),
-                    const SizedBox(
-                      height: 16,
-                    ),
+                    const SizedBox(height: 16),
                     CustomTextField(
                       controller: _locationController,
                       hintText: 'Arizona',
@@ -214,18 +200,14 @@ class _AddEditLawFirmPageState extends State<AddEditLawFirmPage> {
                         return null;
                       },
                     ),
-                    const SizedBox(
-                      height: 16,
-                    ),
+                    const SizedBox(height: 16),
                     CustomTextField(
                       controller: _websiteController,
                       hintText: 'https://',
                       labelText: 'Website',
                       validator: Validator.validateURL,
                     ),
-                    const SizedBox(
-                      height: 16,
-                    ),
+                    const SizedBox(height: 16),
                     CustomTextField(
                       controller: _aboutController,
                       hintText: 'Share more about your firm',
@@ -239,37 +221,25 @@ class _AddEditLawFirmPageState extends State<AddEditLawFirmPage> {
                         return null;
                       },
                     ),
-                    const SizedBox(
-                      height: 16,
-                    ),
+                    const SizedBox(height: 16),
                     Text(
                       'Social Media Links',
                       style: Theme.of(context).textTheme.bodyLarge,
                     ),
-                    FirmSocialMedias(
-                      firmBloc: _firmBloc,
-                    ),
+                    FirmSocialMedias(firmBloc: _firmBloc),
                     TextButton.icon(
-                      onPressed: () => _firmBloc.add(
-                        SocialMediaFieldAdded(),
-                      ),
+                      onPressed: () => _firmBloc.add(SocialMediaFieldAdded()),
                       style: TextButton.styleFrom(
                         iconColor: Colors.blue,
-                        padding: EdgeInsets.symmetric(
-                          vertical: 8.h,
-                        ),
+                        padding: EdgeInsets.symmetric(vertical: 8.h),
                       ),
                       label: const Text(
                         'Add Social Media',
-                        style: TextStyle(
-                          color: Colors.blue,
-                        ),
+                        style: TextStyle(color: Colors.blue),
                       ),
                       icon: const Icon(Icons.add),
                     ),
-                    const SizedBox(
-                      height: 16,
-                    ),
+                    const SizedBox(height: 16),
                     CustomElevatedButton(
                       text: 'Add Firm',
                       onTap: () => _addFirm(state: state),
@@ -306,7 +276,7 @@ class _AddEditLawFirmPageState extends State<AddEditLawFirmPage> {
       final addFirm = AddFirmReq(
         name: _nameController.text,
         ownerUserId: userId,
-        orgType: _orgTypeController.text,
+orgType: _orgTypeNotifier.value ?? '',
         file: file,
         location: _locationController.text,
         website: _websiteController.text,

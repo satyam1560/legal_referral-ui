@@ -7,11 +7,11 @@ part of 'email_auth_res.dart';
 // **************************************************************************
 
 EmailAuthRes _$EmailAuthResFromJson(Map<String, dynamic> json) => EmailAuthRes(
-      user: AppUser.fromJson(json['user'] as Map<String, dynamic>),
-      idToken: json['id_token'] as String,
-      refreshToken: json['refresh_token'] as String,
-      expiresIn: json['expires_in'] as String,
-    );
+  user: AppUser.fromJson(json['user'] as Map<String, dynamic>),
+  idToken: json['id_token'] as String,
+  refreshToken: json['refresh_token'] as String,
+  expiresIn: json['expires_in'] as String,
+);
 
 Map<String, dynamic> _$EmailAuthResToJson(EmailAuthRes instance) =>
     <String, dynamic>{

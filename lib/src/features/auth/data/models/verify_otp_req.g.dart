@@ -7,11 +7,11 @@ part of 'verify_otp_req.dart';
 // **************************************************************************
 
 VerifyOtpReq _$VerifyOtpReqFromJson(Map<String, dynamic> json) => VerifyOtpReq(
-      to: json['to'] as String,
-      otp: json['otp'] as String,
-      channel: json['channel'] as String,
-      userId: json['user_id'] as String?,
-    );
+  to: json['to'] as String,
+  otp: json['otp'] as String,
+  channel: json['channel'] as String,
+  userId: json['user_id'] as String?,
+);
 
 Map<String, dynamic> _$VerifyOtpReqToJson(VerifyOtpReq instance) =>
     <String, dynamic>{

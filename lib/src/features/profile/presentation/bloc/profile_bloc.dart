@@ -1,11 +1,14 @@
 import 'dart:io';
 
+import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 import 'package:legal_referral_ui/src/core/config/config.dart';
 import 'package:legal_referral_ui/src/features/auth/presentation/presentation.dart';
+import 'package:legal_referral_ui/src/features/feed/data/data.dart';
 import 'package:legal_referral_ui/src/features/firm/domain/domain.dart';
+import 'package:legal_referral_ui/src/features/post/domain/domain.dart';
 import 'package:legal_referral_ui/src/features/profile/data/data.dart';
 import 'package:legal_referral_ui/src/features/profile/domain/domain.dart';
 import 'package:stream_transform/stream_transform.dart';
@@ -17,6 +20,14 @@ const _duration = Duration(milliseconds: 300);
 
 EventTransformer<Event> debounce<Event>(Duration duration) {
   return (events, mapper) => events.debounce(duration).switchMap(mapper);
+}
+
+const _throttleDuration = Duration(milliseconds: 100);
+
+EventTransformer<E> _throttleDroppable<E>(Duration duration) {
+  return (events, mapper) {
+    return droppable<E>().call(events.throttle(duration), mapper);
+  };
 }
 
 @injectable
@@ -50,7 +61,16 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     on<EducationUpdated>(_onEducationUpdated);
     on<EducationDeleted>(_onEducationDeleted);
     on<FeaturePostsFetched>(_onFeaturePostsFetched);
-    on<FeaturePostUnsaved>(_onFeaturePostUnsaved);
+    on<PostUnFeatured>(_onFeaturePostUnsaved);
+    on<UserFollowersCountFetched>(_onUserFollowersCountFetched);
+    on<ActivityTypeChanged>(_onActivityTypeChanged);
+    on<ActivityPostsFetched>(
+      _onActivityPostsFetched,
+      transformer: _throttleDroppable(
+        _throttleDuration,
+      ),
+    );
+    on<ActivityCommentsFetched>(_onActivityCommentsFetched);
   }
 
   final AuthBloc _authBloc;
@@ -904,11 +924,15 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   }
 
   Future<void> _onFeaturePostUnsaved(
-    FeaturePostUnsaved event,
+    PostUnFeatured event,
     Emitter<ProfileState> emit,
   ) async {
-    final response = await _profileUseCase.unsaveFeaturePost(
+    final response = await _profileUseCase.unFeaturePost(
       postId: event.postId,
+      unFeaturePostReq: UnFeaturePostReq(
+        userId: _authBloc.state.user?.userId ?? '',
+        postId: event.postId,
+      ),
     );
 
     response.fold(
@@ -935,5 +959,209 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         }
       },
     );
+  }
+
+  Future<void> _onUserFollowersCountFetched(
+    UserFollowersCountFetched event,
+    Emitter<ProfileState> emit,
+  ) async {
+    final res = await _profileUseCase.fetchUserFollowersCount(
+      userId: event.userId,
+    );
+
+    res.fold(
+      (failure) {
+        emit(
+          state.copyWith(
+            profileStatus: ProfileStatus.failure,
+            failure: failure,
+          ),
+        );
+      },
+      (followersCount) {
+        emit(
+          state.copyWith(
+            profileStatus: ProfileStatus.success,
+            followersCount: followersCount,
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _onActivityTypeChanged(
+    ActivityTypeChanged event,
+    Emitter<ProfileState> emit,
+  ) async {
+    emit(
+      state.copyWith(
+        activityType: event.activityType,
+        activityOffset: 1,
+        activityHasReachedMax: false,
+        activityPosts: const [],
+        activityComments: const [],
+        activityStatus: ActivityStatus.initial,
+      ),
+    );
+    final userId = _authBloc.state.user?.userId;
+    if (userId == null) {
+      return;
+    }
+
+    if (state.activityType == ActivityType.post) {
+      add(
+        ActivityPostsFetched(
+          userId: userId,
+          limit: event.isFromAllActivities ? 10 : 1,
+        ),
+      );
+    } else {
+      add(
+        ActivityCommentsFetched(
+          userId: userId,
+          limit: event.isFromAllActivities ? 10 : 5,
+        ),
+      );
+    }
+  }
+
+  Future<void> _onActivityPostsFetched(
+    ActivityPostsFetched event,
+    Emitter<ProfileState> emit,
+  ) async {
+    if (state.activityHasReachedMax) return;
+
+    if (state.activityStatus == ActivityStatus.initial) {
+      emit(
+        state.copyWith(
+          activityStatus: ActivityStatus.loading,
+        ),
+      );
+
+      final res = await _profileUseCase.fetchActivityPosts(
+        userId: event.userId,
+        limit: event.limit,
+        offset: state.activityOffset,
+      );
+      res.fold(
+        (failure) {
+          emit(
+            state.copyWith(
+              activityStatus: ActivityStatus.failure,
+              failure: failure,
+            ),
+          );
+        },
+        (activityPosts) {
+          emit(
+            state.copyWith(
+              activityStatus: ActivityStatus.success,
+              activityPosts: activityPosts,
+              activityOffset: state.activityOffset + 1,
+              activityHasReachedMax: activityPosts.length < event.limit,
+            ),
+          );
+        },
+      );
+    } else {
+      final res = await _profileUseCase.fetchActivityPosts(
+        userId: event.userId,
+        limit: event.limit,
+        offset: state.activityOffset,
+      );
+
+      res.fold(
+        (failure) {
+          emit(
+            state.copyWith(
+              activityStatus: ActivityStatus.failure,
+              failure: failure,
+            ),
+          );
+        },
+        (activityPosts) {
+          emit(
+            state.copyWith(
+              activityStatus: ActivityStatus.success,
+              activityPosts: [...state.activityPosts, ...activityPosts],
+              activityOffset: state.activityOffset + 1,
+              activityHasReachedMax: activityPosts.length < event.limit,
+            ),
+          );
+        },
+      );
+    }
+  }
+
+  Future<void> _onActivityCommentsFetched(
+    ActivityCommentsFetched event,
+    Emitter<ProfileState> emit,
+  ) async {
+    if (state.activityHasReachedMax) return;
+
+    if (state.activityStatus == ActivityStatus.initial) {
+      emit(
+        state.copyWith(
+          activityStatus: ActivityStatus.loading,
+        ),
+      );
+
+      final res = await _profileUseCase.fetchActivityComments(
+        userId: event.userId,
+        limit: event.limit,
+        offset: state.activityOffset,
+      );
+
+      res.fold(
+        (failure) {
+          emit(
+            state.copyWith(
+              activityStatus: ActivityStatus.failure,
+              failure: failure,
+            ),
+          );
+        },
+        (activityComments) {
+          emit(
+            state.copyWith(
+              activityStatus: ActivityStatus.success,
+              activityComments: activityComments,
+              activityOffset: state.activityOffset + 1,
+              activityHasReachedMax: activityComments.length < event.limit,
+            ),
+          );
+        },
+      );
+    } else {
+      final res = await _profileUseCase.fetchActivityComments(
+        userId: event.userId,
+        limit: event.limit,
+        offset: state.activityOffset,
+      );
+
+      res.fold(
+        (failure) {
+          emit(
+            state.copyWith(
+              activityStatus: ActivityStatus.failure,
+              failure: failure,
+            ),
+          );
+        },
+        (activityComments) {
+          emit(
+            state.copyWith(
+              activityStatus: ActivityStatus.success,
+              activityComments: [
+                ...state.activityComments,
+                ...activityComments,
+              ],
+              activityOffset: state.activityOffset + 1,
+              activityHasReachedMax: activityComments.length < event.limit,
+            ),
+          );
+        },
+      );
+    }
   }
 }

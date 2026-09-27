@@ -18,6 +18,19 @@ class PostTextChanged extends PostEvent {
   List<Object> get props => [text];
 }
 
+class PostCreated extends PostEvent {
+  const PostCreated({
+    required this.ownerId,
+    required this.content,
+  });
+
+  final String ownerId;
+  final String content;
+
+  @override
+  List<Object> get props => [ownerId, content];
+}
+
 class FilePicked extends PostEvent {
   const FilePicked({required this.postType});
 
@@ -31,20 +44,8 @@ class FileRemoved extends PostEvent {
   const FileRemoved({
     this.index,
   });
+
   final int? index;
-}
-
-class PostCreated extends PostEvent {
-  const PostCreated({
-    required this.ownerId,
-    required this.content,
-  });
-
-  final String ownerId;
-  final String content;
-
-  @override
-  List<Object> get props => [ownerId, content];
 }
 
 class PostFetched extends PostEvent {
@@ -67,4 +68,95 @@ class PostLikesAndCommentsCountFetched extends PostEvent {
 
   @override
   List<Object> get props => [postId];
+}
+
+class PostLiked extends PostEvent {
+  const PostLiked({
+    required this.postOwnerId,
+    required this.currentUserId,
+    required this.postId,
+  });
+
+  final String postOwnerId;
+  final String currentUserId;
+  final int postId;
+
+  @override
+  List<Object> get props => [postOwnerId, currentUserId, postId];
+}
+
+class PostUnliked extends PostEvent {
+  const PostUnliked({
+    required this.postId,
+  });
+
+  final int postId;
+
+  @override
+  List<Object> get props => [postId];
+}
+
+class PostLikedUsersFetched extends PostEvent {
+  const PostLikedUsersFetched({
+    required this.postId,
+  });
+
+  final int postId;
+
+  @override
+  List<Object> get props => [postId];
+}
+
+class PostCommented extends PostEvent {
+  const PostCommented({
+    required this.comment,
+    required this.user,
+  });
+
+  final CommentReq comment;
+  final AppUser? user;
+}
+
+class PostCommentsFetched extends PostEvent {
+  const PostCommentsFetched({
+    required this.postId,
+  });
+
+  final int postId;
+
+  @override
+  List<Object> get props => [postId];
+}
+
+class PostCommentLiked extends PostEvent {
+  const PostCommentLiked({
+    required this.commentId,
+  });
+
+  final int commentId;
+
+  @override
+  List<Object> get props => [commentId];
+}
+
+class PostCommentUnliked extends PostEvent {
+  const PostCommentUnliked({
+    required this.commentId,
+  });
+
+  final int commentId;
+
+  @override
+  List<Object> get props => [commentId];
+}
+
+class PostParentCommentIdChanged extends PostEvent {
+  const PostParentCommentIdChanged({
+    required this.parentCommentId,
+  });
+
+  final int parentCommentId;
+
+  @override
+  List<Object> get props => [parentCommentId];
 }

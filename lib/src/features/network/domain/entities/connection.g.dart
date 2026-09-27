@@ -6,20 +6,21 @@ part of 'connection.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$ConnectionImpl _$$ConnectionImplFromJson(Map<String, dynamic> json) =>
-    _$ConnectionImpl(
-      id: (json['id'] as num?)?.toInt(),
-      senderId: json['sender_id'] as String?,
-      recipientId: json['recipient_id'] as String?,
-      firstName: json['first_name'] as String?,
-      lastName: json['last_name'] as String?,
-      about: json['about'] as String?,
-      avatarUrl: json['avatar_url'] as String?,
-      createdAt: _$JsonConverterFromJson<String, DateTime>(
-          json['created_at'], const DateTimeJsonConverter().fromJson),
-    );
+_Connection _$ConnectionFromJson(Map<String, dynamic> json) => _Connection(
+  id: (json['id'] as num?)?.toInt(),
+  senderId: json['sender_id'] as String?,
+  recipientId: json['recipient_id'] as String?,
+  firstName: json['first_name'] as String?,
+  lastName: json['last_name'] as String?,
+  about: json['about'] as String?,
+  avatarUrl: json['avatar_url'] as String?,
+  createdAt: _$JsonConverterFromJson<String, DateTime>(
+    json['created_at'],
+    const DateTimeJsonConverter().fromJson,
+  ),
+);
 
-Map<String, dynamic> _$$ConnectionImplToJson(_$ConnectionImpl instance) =>
+Map<String, dynamic> _$ConnectionToJson(_Connection instance) =>
     <String, dynamic>{
       'id': instance.id,
       'sender_id': instance.senderId,
@@ -29,17 +30,17 @@ Map<String, dynamic> _$$ConnectionImplToJson(_$ConnectionImpl instance) =>
       'about': instance.about,
       'avatar_url': instance.avatarUrl,
       'created_at': _$JsonConverterToJson<String, DateTime>(
-          instance.createdAt, const DateTimeJsonConverter().toJson),
+        instance.createdAt,
+        const DateTimeJsonConverter().toJson,
+      ),
     };
 
 Value? _$JsonConverterFromJson<Json, Value>(
   Object? json,
   Value? Function(Json json) fromJson,
-) =>
-    json == null ? null : fromJson(json as Json);
+) => json == null ? null : fromJson(json as Json);
 
 Json? _$JsonConverterToJson<Json, Value>(
   Value? value,
   Json? Function(Value value) toJson,
-) =>
-    value == null ? null : toJson(value);
+) => value == null ? null : toJson(value);

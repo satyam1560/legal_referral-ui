@@ -9,7 +9,6 @@ class ChatState extends Equatable {
     this.connections = const <Connection>[],
     this.chatRooms = const <ChatRoom>[],
     this.chatMessages = const <ChatMessage>[],
-    this.messages = const <types.Message>[],
     this.parentMessage,
     this.offset = 1,
     this.hasReachedMax = false,
@@ -30,7 +29,6 @@ class ChatState extends Equatable {
   final List<Connection?> connections;
   final List<ChatRoom?> chatRooms;
   final List<ChatMessage?> chatMessages;
-  final List<types.Message> messages;
   final ChatRoom currentChatRoom;
   final ChatMessage? parentMessage;
   final bool hasReachedMax;
@@ -42,7 +40,6 @@ class ChatState extends Equatable {
     List<Connection?>? connections,
     List<ChatRoom?>? chatRooms,
     List<ChatMessage?>? chatMessages,
-    List<types.Message>? messages,
     ChatRoom? currentChatRoom,
     ChatMessage? parentMessage,
     int? offset,
@@ -53,7 +50,6 @@ class ChatState extends Equatable {
       status: status ?? this.status,
       connections: connections ?? this.connections,
       chatRooms: chatRooms ?? this.chatRooms,
-      messages: messages ?? this.messages,
       chatMessages: chatMessages ?? this.chatMessages,
       currentChatRoom: currentChatRoom ?? this.currentChatRoom,
       parentMessage: parentMessage,
@@ -68,7 +64,6 @@ class ChatState extends Equatable {
         status,
         connections,
         chatRooms,
-        messages,
         chatMessages,
         currentChatRoom,
         parentMessage,

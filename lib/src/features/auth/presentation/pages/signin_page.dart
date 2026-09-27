@@ -1,3 +1,7 @@
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -32,8 +36,11 @@ class _SignInPageState extends State<SignInPage> {
   @override
   void initState() {
     _authBloc.add(AuthInitialized());
+  
     super.initState();
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -104,8 +111,12 @@ class _SignInPageState extends State<SignInPage> {
                               hintText: 'Enter Password',
                               labelText: 'Password',
                               obscureText: true,
-                              validator: (value) =>
-                                  Validator.validatePassword(value),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Please enter your password';
+                                }
+                                return null;
+                              },
                             ),
                             SizedBox(height: 16.h),
                             Container(
@@ -127,9 +138,7 @@ class _SignInPageState extends State<SignInPage> {
                             SizedBox(height: 24.h),
                             Row(
                               children: [
-                                const Expanded(
-                                  child: Divider(),
-                                ),
+                                const Expanded(child: Divider()),
                                 Text(
                                   '  Or continue using  ',
                                   style: TextStyle(
@@ -138,9 +147,7 @@ class _SignInPageState extends State<SignInPage> {
                                     color: LegalReferralColors.textGrey400,
                                   ),
                                 ),
-                                const Expanded(
-                                  child: Divider(),
-                                ),
+                                const Expanded(child: Divider()),
                               ],
                             ),
                             SizedBox(height: 24.h),
@@ -152,13 +159,13 @@ class _SignInPageState extends State<SignInPage> {
                                   onPressed: () =>
                                       _authBloc.add(AuthGoogleSignedIn()),
                                 ),
-                                SizedBox(width: 12.w),
-                                SvgButton(
-                                  imagePath: IconStringConstants.facebookIcon,
-                                  onPressed: () => _authBloc.add(
-                                    AuthFacebookSignedIn(),
-                                  ),
-                                ),
+                                // SizedBox(width: 12.w),
+                                // SvgButton(
+                                //  imagePath: IconStringConstants.facebookIcon,
+                                //   onPressed: () => _authBloc.add(
+                                //     AuthFacebookSignedIn(),
+                                //   ),
+                                // ),
                                 SizedBox(width: 12.w),
                                 SvgButton(
                                   imagePath: IconStringConstants.appleIcon,
@@ -238,25 +245,25 @@ class _SignInPageState extends State<SignInPage> {
       scope: ['openid', 'profile', 'email'],
     );
 
-    await SignInWithLinkedIn.signIn(
-      context,
-      config: linkedInConfig,
-      onGetAuthToken: (data) {},
-      onGetUserProfile: (token, user) {
-        _authBloc.add(
-          AuthLinkedInSignedIn(
-            email: user.email,
-            firstName: user.givenName,
-            lastName: user.familyName,
-            imageUrl: user.picture,
-            accesToken: token.accessToken,
-          ),
-        );
-      },
-      onSignInError: (error) {
-        AppLogger.error('Error on sign in: $error');
-      },
-    );
+    // await SignInWithLinkedIn.signIn(
+    //   context,
+    //   config: linkedInConfig,
+    //   onGetAuthToken: (data) {},
+    //   onGetUserProfile: (token, user) {
+    //     _authBloc.add(
+    //       AuthLinkedInSignedIn(
+    //         email: user.email,
+    //         firstName: user.givenName,
+    //         lastName: user.familyName,
+    //         imageUrl: user.picture,
+    //         accesToken: token.accessToken,
+    //       ),
+    //     );
+    //   },
+    //   onSignInError: (error) {
+    //     AppLogger.error('Error on sign in: $error');
+    //   },
+    // );
   }
 
   @override
